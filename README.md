@@ -68,7 +68,8 @@ class MyService {
     
     @IncrementOnError("arg.metric", "1.a.deeply.nested.property")
     public incrementOnErrorWithArgs(arg1, arg2, arg3) {
-        // increments "arg.metric" with value derived from path a.deeply.nested.path from arg2 
+        // increments "arg.metric" when the method throws
+        // value is derived from path a.deeply.nested.path from arg2 
         // The prefix `1` in "1.a.deeply.nested.property" is index of argument in target method, which in this case is arg2.
     }
     
@@ -78,6 +79,14 @@ class MyService {
         // If the method call is successful, "around.success" is incremented with the same value
         // If the method call throws, "around.failure" is incremented with the same value
     }
+
+    @IncrementAfter("payment_done", (payment: PaymentDto) => payment.amount)
+    public incrementOnErrorWithArgs(payment: PaymentDto) {
+        // increments "payment_done" metric after the method call completes successfully 
+        // value derived from lambda function passed as value. 
+        // The lambda function receives same arguments as the target method
+    }
+
 }
 ```
 
