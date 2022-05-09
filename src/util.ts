@@ -19,10 +19,18 @@ export function getMetricName(name: string, target: any, descriptor: PropertyDes
  * @param value 25 | "0.deeply.nested.path"
  * @param args
  */
-export function resolveValue(value: number | string | undefined, args: any) {
+export function resolveValue(value: number | string | Function | undefined, args: any) {
   let actualValue = 1;
   if (value === undefined) actualValue = 1;
   else if (Number.isFinite(value)) actualValue = value as number;
+  else if (typeof value === 'function') {
+    const result = value.apply(null, args);
+    if(Number.isFinite(result)) {
+      actualValue = result;
+    } else {
+      console.error('Given function '+ value + ' derived value ' + result + ' is not a number. Defaulting to 1.');
+    }
+  }
   else if (typeof value === 'string') {
     const resolved = resolvePath(args, value);
     if (!resolved.exists) {

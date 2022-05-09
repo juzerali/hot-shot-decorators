@@ -35,6 +35,11 @@ describe('Increment', () => {
       console.log('Argument was: ' + JSON.stringify(arg1));
     }
 
+    @IncrementBefore('before.derive', (arg1: {amount: number}, arg2: object) => arg1.amount)
+    public incBeforeWithFunctionDerivation(arg1: {amount: number}, arg2: object) {
+      console.log('Argument was: ' + JSON.stringify(arg1));
+    }
+
     /** After **/
     @IncrementAfter()
     public incAfterAllDefaults() {}
@@ -175,6 +180,12 @@ describe('Increment', () => {
       const test = new CounterTests();
       test.incBeforeWithArgs({ a: { deeply: { nested: { property: 91 } } } });
       verify(mockedStatsD.increment('before.with.args', 91, anything())).once();
+    });
+
+    it('should derive value from functions', () => {
+      const test = new CounterTests();
+      test.incBeforeWithFunctionDerivation({ amount: 149 }, {});
+      verify(mockedStatsD.increment('before.derive', 149, anything())).once();
     });
   });
 

@@ -8,12 +8,12 @@ import { getMetricName, resolveValue } from './util';
  * @constructor
  */
 export const HistogramBeforeWrapper = (client: StatsD) => {
-  return (name = '', value?: number | string, tags = {}): MethodDecorator => {
+  return (name = '', value?: number | string | Function, tags = {}): MethodDecorator => {
     return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor => {
       const original = descriptor.value;
       const metric = getMetricName(name, target, descriptor);
       descriptor.value = (...args: any) => {
-        const actualValue = resolveValue(value, args);
+        const actualValue = resolveValue({value: value, args: args});
         client.histogram(metric, actualValue, tags);
         original.apply(this, args);
       };
@@ -29,7 +29,7 @@ export const HistogramAfterWrapper = (client: StatsD) => {
       const metric = getMetricName(name, target, descriptor);
       descriptor.value = (...args: any) => {
         original.apply(this, args);
-        const actualValue = resolveValue(value, args);
+        const actualValue = resolveValue({value: value, args: args});
         client.histogram(metric, actualValue, tags);
       };
       return descriptor;
@@ -46,7 +46,7 @@ export const HistogramOnErrorWrapper = (client: StatsD) => {
         try {
           original.apply(this, args);
         } catch (error) {
-          const actualValue = resolveValue(value, args);
+          const actualValue = resolveValue({value: value, args: args});
           client.histogram(metric, actualValue, tags);
         }
       };
@@ -64,7 +64,7 @@ export const HistogramAroundWrapper = (client: StatsD) => {
       const success = metric + '.success';
       const failure = metric + '.failure';
       descriptor.value = (...args: any) => {
-        const actualValue = resolveValue(value, args);
+        const actualValue = resolveValue({value: value, args: args});
         try {
           client.histogram(attempted, actualValue, tags);
           original.apply(this, args);
