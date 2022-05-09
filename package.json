@@ -38,6 +38,7 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
-    "hot-shots": "^9.0.0"
+    "hot-shots": "^9.0.0",
+    "path-value": "^0.9.4"
   }
 }
