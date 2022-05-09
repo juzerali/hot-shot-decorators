@@ -40,6 +40,13 @@ describe('Increment', () => {
       console.log('Argument was: ' + JSON.stringify(arg1));
     }
 
+    @IncrementBefore('before.derive.throws', (arg1: {amount: number}, arg2: object) => {
+      throw new Error();
+    })
+    public incBeforeWithFunctionDerivationThrows(arg1: {amount: number}, arg2: object) {
+      console.log('Argument was: ' + JSON.stringify(arg1));
+    }
+
     /** After **/
     @IncrementAfter()
     public incAfterAllDefaults() {}
@@ -208,6 +215,12 @@ describe('Increment', () => {
       const test = new CounterTests();
       test.incBeforeWithFunctionDerivation({ amount: 149 }, {});
       verify(mockedStatsD.increment('before.derive', 149, anything())).once();
+    });
+
+    it('should default to 1 when derivative function throws', () => {
+      const test = new CounterTests();
+      test.incBeforeWithFunctionDerivationThrows({ amount: 149 }, {});
+      verify(mockedStatsD.increment('before.derive.throws', 1, anything())).once();
     });
   });
 

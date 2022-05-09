@@ -55,9 +55,15 @@ function pathValueResolver(args: any, value: string, actualValue: number) {
  */
 export function resolveValue(value: number | string | Function | undefined, args: any) {
   let actualValue = 1;
-  if (value === undefined) actualValue = 1;
-  else if (Number.isFinite(value)) actualValue = numericValueResolver(actualValue, value);
-  else if (typeof value === 'function') actualValue = functionValueResolver(value, args, actualValue);
-  else if (typeof value === 'string') actualValue = pathValueResolver(args, value, actualValue);
+
+  try {
+    if (value === undefined) actualValue = 1;
+    else if (Number.isFinite(value)) actualValue = numericValueResolver(actualValue, value);
+    else if (typeof value === 'function') actualValue = functionValueResolver(value, args, actualValue);
+    else if (typeof value === 'string') actualValue = pathValueResolver(args, value, actualValue);
+  } catch (e) {
+    console.error("Failed to derive metric value! " + value, e);
+  }
+
   return actualValue;
 }

@@ -42,6 +42,7 @@ export const IncrementAfter = IncrementAfterWrapper(client);
 export const IncrementOnError = IncrementOnErrorWrapper(client);
 export const IncrementAround = IncrementAroundWrapper(client);
 ```
+*NOTE: The decorators will never throw any error and fail silently, in most cases defaulting to value 1*
 #### Add decorators to methods
 
 ```typescript
