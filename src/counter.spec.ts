@@ -58,6 +58,11 @@ describe('Increment', () => {
       console.log('Argument was: ' + JSON.stringify(arg1));
     }
 
+    @IncrementAfter('after.derive', (arg1: {amount: number}, arg2: object) => arg1.amount)
+    public incAfterWithFunctionDerivation(arg1: {amount: number}, arg2: object) {
+      console.log('Argument was: ' + JSON.stringify(arg1));
+    }
+
     /** OnError **/
     private throwError() {
       throw new Error();
@@ -89,6 +94,12 @@ describe('Increment', () => {
       this.throwError();
     }
 
+    @IncrementOnError('onerror.derive', (arg1: {amount: number}, arg2: object) => arg1.amount)
+    public incOnErrorWithFunctionDerivation(arg1: {amount: number}, arg2: object) {
+      console.log('Argument was: ' + JSON.stringify(arg1));
+      this.throwError();
+    }
+
     @IncrementOnError('onerror', 25)
     public incOnNoError() {}
 
@@ -108,6 +119,11 @@ describe('Increment', () => {
 
     @IncrementAround('around.with.args', '0.a.deeply.nested.property')
     public incAroundSuccessWithArgs(arg1: object) {
+      console.log('Argument was: ' + JSON.stringify(arg1));
+    }
+
+    @IncrementAround('around.derive', (arg1: {amount: number}, arg2: object) => arg1.amount)
+    public incAroundSuccessWithFunctionDerivation(arg1: {amount: number}, arg2: object) {
       console.log('Argument was: ' + JSON.stringify(arg1));
     }
 
@@ -133,6 +149,12 @@ describe('Increment', () => {
 
     @IncrementAround('around.with.args', '0.a.deeply.nested.property')
     public incAroundFailureWithArgs(arg1: object) {
+      console.log('Argument was: ' + JSON.stringify(arg1));
+      this.throwError();
+    }
+
+    @IncrementAround('around.derive', (arg1: {amount: number}, arg2: object) => arg1.amount)
+    public incAroundFailureWithFunctionDerivation(arg1: {amount: number}, arg2: object) {
       console.log('Argument was: ' + JSON.stringify(arg1));
       this.throwError();
     }
@@ -228,6 +250,12 @@ describe('Increment', () => {
       test.incAfterWithArgs({ a: { deeply: { nested: { property: [0, 1, 2, 3, 87] } } } });
       verify(mockedStatsD.increment('after.with.args', 87, anything())).once();
     });
+
+    it('should derive value from functions', () => {
+      const test = new CounterTests();
+      test.incAfterWithFunctionDerivation({ amount: 149 }, {});
+      verify(mockedStatsD.increment('after.derive', 149, anything())).once();
+    });
   });
 
   describe('IncrementOnErrorWrapper', () => {
@@ -274,6 +302,12 @@ describe('Increment', () => {
       const test = new CounterTests();
       test.incOnNoError();
       verify(mockedStatsD.increment('onerror', 87, anything())).times(0);
+    });
+
+    it('should derive value from functions', () => {
+      const test = new CounterTests();
+      test.incOnErrorWithFunctionDerivation({ amount: 149 }, {});
+      verify(mockedStatsD.increment('onerror.derive', 149, anything())).once();
     });
   });
 
@@ -368,6 +402,13 @@ describe('Increment', () => {
         verify(success).once();
         verify(attempted).calledBefore(success);
       });
+
+      it('should derive value from function', () => {
+        const test = new CounterTests();
+        test.incAroundSuccessWithFunctionDerivation({ amount: 149 }, {});
+        verify(mockedStatsD.increment('around.derive.attempted', 149, anything())).once();
+        verify(mockedStatsD.increment('around.derive.success', 149, anything())).once();
+      });
     });
 
     describe('failure', () => {
@@ -459,6 +500,13 @@ describe('Increment', () => {
         verify(attempted).once();
         verify(success).once();
         verify(attempted).calledBefore(success);
+      });
+
+      it('should derive value from functions', () => {
+        const test = new CounterTests();
+        test.incAroundFailureWithFunctionDerivation({ amount: 149 }, {});
+        verify(mockedStatsD.increment('around.derive.attempted', 149, anything())).once();
+        verify(mockedStatsD.increment('around.derive.failure', 149, anything())).once();
       });
     });
   });
