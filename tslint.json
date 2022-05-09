@@ -1,4 +1,5 @@
 {
    "extends": ["tslint:recommended", "tslint-config-prettier"],
-   "no-empty": [false]
+   "no-empty": false,
+   "no-console": false
 }
