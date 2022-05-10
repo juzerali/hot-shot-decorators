@@ -48,6 +48,22 @@ describe('Increment', () => {
             ).once();
         });
 
+        it('should report derived tags', () => {
+            const test = new CounterTests();
+            const result = test.incBeforeWithDerivedTags("arg-tag");
+            expect(result).toEqual("incBeforeWithDerivedTags.returnValue");
+            verify(
+                mockedStatsD.increment(
+                    'before.with.derived.tags',
+                    39,
+                    objectContaining({
+                        constTag: 'const-tag',
+                        arg: 'arg-tag',
+                    }),
+                ),
+            ).once();
+        });
+
         it('should inspect arguments', () => {
             const test = new CounterTests();
             const result = test.incBeforeWithArgs({a: {deeply: {nested: {property: 91}}}});
@@ -73,25 +89,29 @@ describe('Increment', () => {
     describe('IncrementAfterWrapper', () => {
         it('should increment by 1 and use stats name as Class#methodName by default', () => {
             const test = new CounterTests();
-            test.incAfterAllDefaults();
+            const result = test.incAfterAllDefaults();
+            expect(result).toEqual("incAfterAllDefaults.returnValue");
             verify(mockedStatsD.increment('CounterTests#incAfterAllDefaults', 1, objectContaining({}))).once();
         });
 
         it('should increment 1 by default', () => {
             const test = new CounterTests();
-            test.incAfterDefaultValue();
+            const result = test.incAfterDefaultValue();
+            expect(result).toEqual("incAfterDefaultValue.returnValue");
             verify(mockedStatsD.increment('after.default.value', 1, anything())).once();
         });
 
         it('should increment on method call', () => {
             const test = new CounterTests();
-            test.incAfter();
+            const result = test.incAfter();
+            expect(result).toEqual("incAfter.returnValue");
             verify(mockedStatsD.increment('after', 23, anything())).once();
         });
 
         it('should report tags', () => {
             const test = new CounterTests();
-            test.incAfterWithTags();
+            const result = test.incAfterWithTags();
+            expect(result).toEqual("incAfterWithTags.returnValue");
             verify(
                 mockedStatsD.increment(
                     'after.with.tags',
@@ -104,15 +124,34 @@ describe('Increment', () => {
             ).once();
         });
 
+        it('should report derived tags', () => {
+            const test = new CounterTests();
+            const result = test.incAfterWithDerivedTags('arg-tag');
+            expect(result).toEqual("incAfterWithDerivedTags.returnValue");
+            verify(
+                mockedStatsD.increment(
+                    'after.with.derived.tags',
+                    40,
+                    objectContaining({
+                        'arg': 'arg-tag',
+                        'returnValue': 'incAfterWithDerivedTags.returnValue',
+                        'constTag': 'const-tag'
+                    }),
+                ),
+            ).once();
+        });
+
         it('should inspect arguments', () => {
             const test = new CounterTests();
-            test.incAfterWithArgs({a: {deeply: {nested: {property: [0, 1, 2, 3, 87]}}}});
+            const result = test.incAfterWithArgs({a: {deeply: {nested: {property: [0, 1, 2, 3, 87]}}}});
+            expect(result).toEqual("incAfterWithArgs.returnValue");
             verify(mockedStatsD.increment('after.with.args', 87, anything())).once();
         });
 
         it('should derive value from functions', () => {
             const test = new CounterTests();
-            test.incAfterWithFunctionDerivation({amount: 149}, {});
+            const result = test.incAfterWithFunctionDerivation({amount: 149}, {});
+            expect(result).toEqual("incAfterWithFunctionDerivation.returnValue");
             verify(mockedStatsD.increment('after.derive', 149, anything())).once();
         });
     });
