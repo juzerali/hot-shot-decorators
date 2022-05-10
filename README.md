@@ -94,8 +94,8 @@ class MyService {
 Values can be following
 
 #### Constant number
-Examples: `1`, `2`, `100`
-The value will be used literally to increment the counter
+Examples: `1`, `2`, `100`, `-20`
+The value will be used literally to increment the counter, or decrement it in case of negative value
 
 #### Argument Path
 Examples: `0.a.deeply.nested.path`, `1` (second argument), `0.some.array.5` (5th element in some.array object of first arg)
@@ -103,7 +103,7 @@ The value will be resolved as per [path-value](https://www.npmjs.com/package/pat
 The first item in the path is argument index (0-based)
 
 #### Function
-Example `(arg1, arg2, arg3) => arg2.deeply.nested.path`
+Example `(arg1, arg2, arg3, returnValueOrError) => arg2.deeply.nested.path`
 The function will be called for getting the value
 
 If all attempts to number resolution fail, it will default to 1. An error will be printed to console.

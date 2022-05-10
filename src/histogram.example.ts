@@ -1,43 +1,92 @@
-import {HistogramAfter, HistogramAround, HistogramBefore, HistogramOnError} from "./metric.decorator";
+import {HistogramAfter, HistogramAround, HistogramBefore, HistogramOnError,} from "./metric.decorator";
 
 /**
  * Class to help test histogram decorators
  */
-export class HistogramTest {
+export class HistogramTests {
     /** Before **/
     @HistogramBefore()
-    public incBeforeAllDefaults() {}
+    public histogramBeforeAllDefaults() {
+        return 'histogramBeforeAllDefaults.returnValue';
+    }
 
     @HistogramBefore('before.default.value')
-    public incBeforeDefaultValue() {}
+    public histogramBeforeDefaultValue() {
+        return 'histogramBeforeDefaultValue.returnValue';
+    }
 
     @HistogramBefore('before', 22)
-    public incBefore() {}
+    public histogramBefore() {
+        return 'histogramBefore.returnValue';
+    }
 
-    @HistogramBefore('before.with.tags', 39, { type: 'Payout', gateway: 'Stripe' })
-    public incBeforeWithTags() {}
+    @HistogramBefore('before.with.tags', 39, {type: 'Payout', gateway: 'Stripe'})
+    public histogramBeforeWithTags() {
+        return 'histogramBeforeWithTags.returnValue';
+    }
+
+
+    @HistogramBefore('before.with.derived.tags', 39, (arg: string) => {return {arg, constTag: 'const-tag'}})
+    public histogramBeforeWithDerivedTags(arg: string) {
+        return 'histogramBeforeWithDerivedTags.returnValue';
+    }
 
     @HistogramBefore('before.with.args', '0.a.deeply.nested.property')
-    public incBeforeWithArgs(arg1: object) {
+    public histogramBeforeWithArgs(arg1: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
+        return 'histogramBeforeWithArgs.returnValue';
+    }
+
+    @HistogramBefore('before.derive', (arg1: { amount: number }, arg2: object) => arg1.amount)
+    public histogramBeforeWithFunctionDerivation(arg1: { amount: number }, arg2: object) {
+        console.log('Argument was: ' + JSON.stringify(arg1));
+        return 'histogramBeforeWithFunctionDerivation.returnValue';
+    }
+
+    @HistogramBefore('before.derive.throws', (arg1: { amount: number }, arg2: object) => {
+        throw new Error();
+    })
+    public histogramBeforeWithFunctionDerivationThrows(arg1: { amount: number }, arg2: object) {
+        console.log('Argument was: ' + JSON.stringify(arg1));
+        return 'histogramBeforeWithFunctionDerivationThrows.returnValue';
     }
 
     /** After **/
     @HistogramAfter()
-    public incAfterAllDefaults() {}
+    public histogramAfterAllDefaults() {
+        return 'histogramAfterAllDefaults.returnValue';
+    }
 
     @HistogramAfter('after.default.value')
-    public incAfterDefaultValue() {}
+    public histogramAfterDefaultValue() {
+        return 'histogramAfterDefaultValue.returnValue';
+    }
 
     @HistogramAfter('after', 23)
-    public incAfter() {}
+    public histogramAfter() {
+        return 'histogramAfter.returnValue';
+    }
 
-    @HistogramAfter('after.with.tags', 40, { type: 'Payout', gateway: 'Stripe' })
-    public incAfterWithTags() {}
+    @HistogramAfter('after.with.tags', 40, {type: 'Payout', gateway: 'Stripe'})
+    public histogramAfterWithTags() {
+        return 'histogramAfterWithTags.returnValue';
+    }
+
+    @HistogramAfter('after.with.derived.tags', 40, (arg: string, returnValue: string) => {return {arg, returnValue, constTag: 'const-tag'}})
+    public histogramAfterWithDerivedTags(arg: string): string {
+        return 'histogramAfterWithDerivedTags.returnValue';
+    }
 
     @HistogramAfter('after.with.args', '0.a.deeply.nested.property.4')
-    public incAfterWithArgs(arg1: object) {
+    public histogramAfterWithArgs(arg1: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
+        return 'histogramAfterWithArgs.returnValue';
+    }
+
+    @HistogramAfter('after.derive', (arg1: { amount: number }, arg2: object) => arg1.amount)
+    public histogramAfterWithFunctionDerivation(arg1: { amount: number }, arg2: object) {
+        console.log('Argument was: ' + JSON.stringify(arg1));
+        return 'histogramAfterWithFunctionDerivation.returnValue';
     }
 
     /** OnError **/
@@ -46,75 +95,101 @@ export class HistogramTest {
     }
 
     @HistogramOnError()
-    public incOnErrorAllDefaults() {
+    public histogramOnErrorAllDefaults() {
         this.throwError();
     }
 
     @HistogramOnError('onerror.default.value')
-    public incOnErrorDefaultValue() {
+    public histogramOnErrorDefaultValue() {
         this.throwError();
     }
 
     @HistogramOnError('onerror', 26)
-    public incOnError() {
+    public histogramOnError() {
         this.throwError();
     }
 
-    @HistogramOnError('onerror.with.tags', 40, { type: 'Payout', gateway: 'Stripe' })
-    public incOnErrorWithTags() {
+    @HistogramOnError('onerror.with.tags', 40, {type: 'Payout', gateway: 'Stripe'})
+    public histogramOnErrorWithTags() {
         this.throwError();
+    }
+
+    /** Don't add error.message as tag in production, tag should have low cardinality **/
+    @HistogramOnError('onerror.with.derived.tags', 40, (arg: string, error: any) => {return {arg, constTag: 'const-tag', error: error.message}})
+    public histogramOnErrorWithDerivedTags(arg: string) {
+        throw new Error("error-1");
     }
 
     @HistogramOnError('onerror.with.args', '0.a.deeply.nested.property.4')
-    public incOnErrorWithArgs(arg1: object) {
+    public histogramOnErrorWithArgs(arg1: object) {
+        console.log('Argument was: ' + JSON.stringify(arg1));
+        this.throwError();
+    }
+
+    @HistogramOnError('onerror.derive', (arg1: { amount: number }, arg2: object) => arg1.amount)
+    public histogramOnErrorWithFunctionDerivation(arg1: { amount: number }, arg2: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
         this.throwError();
     }
 
     @HistogramOnError('onerror', 25)
-    public incOnNoError() {}
+    public histogramOnNoError() {
+    }
 
     /** Around **/
 
     @HistogramAround()
-    public incAroundSuccessAllDefaults() {}
+    public histogramAroundSuccessAllDefaults() {
+    }
 
     @HistogramAround('around.default.value')
-    public incAroundSuccessDefaultValue() {}
+    public histogramAroundSuccessDefaultValue() {
+    }
 
     @HistogramAround('around', 87)
-    public incAroundSuccess() {}
+    public histogramAroundSuccess() {}
 
-    @HistogramAround('around.with.tags', 40, { type: 'Payout', gateway: 'Stripe' })
-    public incAroundSuccessWithTags() {}
+    @HistogramAround('around.with.tags', 40, {type: 'Payout', gateway: 'Stripe'})
+    public histogramAroundSuccessWithTags() {}
 
     @HistogramAround('around.with.args', '0.a.deeply.nested.property')
-    public incAroundSuccessWithArgs(arg1: object) {
+    public histogramAroundSuccessWithArgs(arg1: object) {
+        console.log('Argument was: ' + JSON.stringify(arg1));
+    }
+
+    @HistogramAround('around.derive', (arg1: { amount: number }, arg2: object) => arg1.amount)
+    public histogramAroundSuccessWithFunctionDerivation(arg1: { amount: number }, arg2: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
     }
 
     @HistogramAround()
-    public incAroundFailureAllDefaults() {
+    public histogramAroundFailureAllDefaults() {
         this.throwError();
     }
 
     @HistogramAround('around.default.value')
-    public incAroundFailureDefaultValue() {
+    public histogramAroundFailureDefaultValue() {
         this.throwError();
     }
 
     @HistogramAround('around', 87)
-    public incAroundFailure() {
+    public histogramAroundFailure() {
         this.throwError();
     }
 
-    @HistogramAround('around.with.tags', 40, { type: 'Payout', gateway: 'Stripe' })
-    public incAroundFailureWithTags() {
+    @HistogramAround('around.with.tags', 40, {type: 'Payout', gateway: 'Stripe'})
+    public histogramAroundFailureWithTags() {
         this.throwError();
     }
 
     @HistogramAround('around.with.args', '0.a.deeply.nested.property')
-    public incAroundFailureWithArgs(arg1: object) {
+    public histogramAroundFailureWithArgs(arg1: object) {
+        console.log('Argument was: ' + JSON.stringify(arg1));
+        this.throwError();
+    }
+
+    @HistogramAround('around.derive', (arg1: { amount: number }, arg2: object) => arg1.amount)
+    public histogramAroundFailureWithFunctionDerivation(arg1: { amount: number }, arg2: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
         this.throwError();
     }
