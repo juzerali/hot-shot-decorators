@@ -17,7 +17,7 @@ export const IncrementBeforeWrapper = (client: StatsD) => {
       descriptor.value = (...args: any) => {
         const actualValue = resolveValue(value, args);
         client.increment(metric, actualValue, tags);
-        original.apply(this, args);
+        return original.apply(this, args);
       };
       return descriptor;
     };
@@ -30,9 +30,10 @@ export const IncrementAfterWrapper = (client: StatsD) => {
       const original = descriptor.value;
       const metric = getMetricName(name, target, descriptor);
       descriptor.value = (...args: any) => {
-        original.apply(this, args);
-        const actualValue = resolveValue(value, args);
+        const returnValue = original.apply(this, args);
+        const actualValue = resolveValue(value, [...args, returnValue]);
         client.increment(metric, actualValue, tags);
+        return returnValue;
       };
       return descriptor;
     };
@@ -46,10 +47,11 @@ export const IncrementOnErrorWrapper = (client: StatsD) => {
       const metric = getMetricName(name, target, descriptor);
       descriptor.value = (...args: any) => {
         try {
-          original.apply(this, args);
+          return original.apply(this, args);
         } catch (error) {
           const actualValue = resolveValue(value, args);
           client.increment(metric, actualValue, tags);
+          throw error;
         }
       };
       return descriptor;
@@ -69,10 +71,12 @@ export const IncrementAroundWrapper = (client: StatsD) => {
         const actualValue = resolveValue(value, args);
         try {
           client.increment(attempted, actualValue, tags);
-          original.apply(this, args);
+          const returnValue = original.apply(this, args);
           client.increment(success, actualValue, tags);
+          return returnValue;
         } catch (error) {
           client.increment(failure, actualValue, tags);
+          throw error;
         }
       };
       return descriptor;

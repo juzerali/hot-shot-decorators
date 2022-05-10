@@ -14,6 +14,10 @@ import {
 } from "./histogram";
 
 /**
+ * Copy this file in your project and make necessary changes
+ */
+
+/**
  * Setup hotshot config as per your environment
  */
 const hotShotConfig = {

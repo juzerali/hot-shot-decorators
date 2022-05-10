@@ -6,54 +6,69 @@ import {IncrementAfter, IncrementAround, IncrementBefore, IncrementOnError} from
 export class CounterTests {
     /** Before **/
     @IncrementBefore()
-    public incBeforeAllDefaults() {}
+    public incBeforeAllDefaults() {
+        return 'incBeforeAllDefaults.returnValue';
+    }
 
     @IncrementBefore('before.default.value')
-    public incBeforeDefaultValue() {}
+    public incBeforeDefaultValue() {
+        return 'incBeforeDefaultValue.returnValue';
+    }
 
     @IncrementBefore('before', 22)
-    public incBefore() {}
+    public incBefore() {
+        return 'incBefore.returnValue';
+    }
 
-    @IncrementBefore('before.with.tags', 39, { type: 'Payout', gateway: 'Stripe' })
-    public incBeforeWithTags() {}
+    @IncrementBefore('before.with.tags', 39, {type: 'Payout', gateway: 'Stripe'})
+    public incBeforeWithTags() {
+        return 'incBeforeWithTags.returnValue';
+    }
 
     @IncrementBefore('before.with.args', '0.a.deeply.nested.property')
     public incBeforeWithArgs(arg1: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
+        return 'incBeforeWithArgs.returnValue';
     }
 
-    @IncrementBefore('before.derive', (arg1: {amount: number}, arg2: object) => arg1.amount)
-    public incBeforeWithFunctionDerivation(arg1: {amount: number}, arg2: object) {
+    @IncrementBefore('before.derive', (arg1: { amount: number }, arg2: object) => arg1.amount)
+    public incBeforeWithFunctionDerivation(arg1: { amount: number }, arg2: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
+        return 'incBeforeWithFunctionDerivation.returnValue';
     }
 
-    @IncrementBefore('before.derive.throws', (arg1: {amount: number}, arg2: object) => {
+    @IncrementBefore('before.derive.throws', (arg1: { amount: number }, arg2: object) => {
         throw new Error();
     })
-    public incBeforeWithFunctionDerivationThrows(arg1: {amount: number}, arg2: object) {
+    public incBeforeWithFunctionDerivationThrows(arg1: { amount: number }, arg2: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
+        return 'incBeforeWithFunctionDerivationThrows.returnValue';
     }
 
     /** After **/
     @IncrementAfter()
-    public incAfterAllDefaults() {}
+    public incAfterAllDefaults() {
+    }
 
     @IncrementAfter('after.default.value')
-    public incAfterDefaultValue() {}
+    public incAfterDefaultValue() {
+    }
 
     @IncrementAfter('after', 23)
-    public incAfter() {}
+    public incAfter() {
+    }
 
-    @IncrementAfter('after.with.tags', 40, { type: 'Payout', gateway: 'Stripe' })
-    public incAfterWithTags() {}
+    @IncrementAfter('after.with.tags', 40, {type: 'Payout', gateway: 'Stripe'})
+    public incAfterWithTags() {
+    }
 
     @IncrementAfter('after.with.args', '0.a.deeply.nested.property.4')
     public incAfterWithArgs(arg1: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
     }
 
-    @IncrementAfter('after.derive', (arg1: {amount: number}, arg2: object) => arg1.amount)
-    public incAfterWithFunctionDerivation(arg1: {amount: number}, arg2: object) {
+    @IncrementAfter('after.derive', (arg1: { amount: number }, arg2: object) => arg1.amount)
+    public incAfterWithFunctionDerivation(arg1: { amount: number }, arg2: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
     }
 
@@ -77,7 +92,7 @@ export class CounterTests {
         this.throwError();
     }
 
-    @IncrementOnError('onerror.with.tags', 40, { type: 'Payout', gateway: 'Stripe' })
+    @IncrementOnError('onerror.with.tags', 40, {type: 'Payout', gateway: 'Stripe'})
     public incOnErrorWithTags() {
         this.throwError();
     }
@@ -88,36 +103,41 @@ export class CounterTests {
         this.throwError();
     }
 
-    @IncrementOnError('onerror.derive', (arg1: {amount: number}, arg2: object) => arg1.amount)
-    public incOnErrorWithFunctionDerivation(arg1: {amount: number}, arg2: object) {
+    @IncrementOnError('onerror.derive', (arg1: { amount: number }, arg2: object) => arg1.amount)
+    public incOnErrorWithFunctionDerivation(arg1: { amount: number }, arg2: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
         this.throwError();
     }
 
     @IncrementOnError('onerror', 25)
-    public incOnNoError() {}
+    public incOnNoError() {
+    }
 
     /** Around **/
 
     @IncrementAround()
-    public incAroundSuccessAllDefaults() {}
+    public incAroundSuccessAllDefaults() {
+    }
 
     @IncrementAround('around.default.value')
-    public incAroundSuccessDefaultValue() {}
+    public incAroundSuccessDefaultValue() {
+    }
 
     @IncrementAround('around', 87)
-    public incAroundSuccess() {}
+    public incAroundSuccess() {
+    }
 
-    @IncrementAround('around.with.tags', 40, { type: 'Payout', gateway: 'Stripe' })
-    public incAroundSuccessWithTags() {}
+    @IncrementAround('around.with.tags', 40, {type: 'Payout', gateway: 'Stripe'})
+    public incAroundSuccessWithTags() {
+    }
 
     @IncrementAround('around.with.args', '0.a.deeply.nested.property')
     public incAroundSuccessWithArgs(arg1: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
     }
 
-    @IncrementAround('around.derive', (arg1: {amount: number}, arg2: object) => arg1.amount)
-    public incAroundSuccessWithFunctionDerivation(arg1: {amount: number}, arg2: object) {
+    @IncrementAround('around.derive', (arg1: { amount: number }, arg2: object) => arg1.amount)
+    public incAroundSuccessWithFunctionDerivation(arg1: { amount: number }, arg2: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
     }
 
@@ -136,7 +156,7 @@ export class CounterTests {
         this.throwError();
     }
 
-    @IncrementAround('around.with.tags', 40, { type: 'Payout', gateway: 'Stripe' })
+    @IncrementAround('around.with.tags', 40, {type: 'Payout', gateway: 'Stripe'})
     public incAroundFailureWithTags() {
         this.throwError();
     }
@@ -147,8 +167,8 @@ export class CounterTests {
         this.throwError();
     }
 
-    @IncrementAround('around.derive', (arg1: {amount: number}, arg2: object) => arg1.amount)
-    public incAroundFailureWithFunctionDerivation(arg1: {amount: number}, arg2: object) {
+    @IncrementAround('around.derive', (arg1: { amount: number }, arg2: object) => arg1.amount)
+    public incAroundFailureWithFunctionDerivation(arg1: { amount: number }, arg2: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
         this.throwError();
     }
