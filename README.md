@@ -57,7 +57,7 @@ class MyService {
 
     @IncrementBefore()
     public incrementBeforeDefaults() {
-        // increments MyService#incrementBeforeDefaults with value 1 before the method is executed
+        // increments MyService.incrementBeforeDefaults with value 1 before the method is executed
     }
 
     @IncrementAfter("my.metric", 2, {type: "Payout", gateway: "Stripe"})

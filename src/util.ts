@@ -13,7 +13,7 @@ export type ValueDerivation = number | string | Function | undefined;
  * @param descriptor
  */
 export function getMetricName(name: string, target: any, descriptor: PropertyDescriptor) {
-    return (name && name.length !== 0) ? name : target.constructor.name + '#' + descriptor.value.name;
+    return (name && name.length !== 0) ? name : target.constructor.name + '.' + descriptor.value.name;
 }
 
 function numericValueResolver(actualValue: number, value: number | string | Function) {

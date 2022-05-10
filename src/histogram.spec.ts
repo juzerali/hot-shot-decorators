@@ -12,11 +12,11 @@ describe('Histogram', () => {
   });
 
   describe('HistogramBeforeWrapper', () => {
-    it('should increment by 1 and use stats name as Class#methodName by default', () => {
+    it('should increment by 1 and use stats name as Class.methodName by default', () => {
       const test = new HistogramTests();
       const result = test.histogramBeforeAllDefaults();
       expect(result).toEqual("histogramBeforeAllDefaults.returnValue");
-      verify(mockedStatsD.histogram('HistogramTests#histogramBeforeAllDefaults', 1, objectContaining({}))).once();
+      verify(mockedStatsD.histogram('HistogramTests.histogramBeforeAllDefaults', 1, objectContaining({}))).once();
     });
 
     it('should increment 1 be default', () => {
@@ -88,11 +88,11 @@ describe('Histogram', () => {
   });
 
   describe('HistogramAfterWrapper', () => {
-    it('should increment by 1 and use stats name as Class#methodName by default', () => {
+    it('should increment by 1 and use stats name as Class.methodName by default', () => {
       const test = new HistogramTests();
       const result = test.histogramAfterAllDefaults();
       expect(result).toEqual("histogramAfterAllDefaults.returnValue");
-      verify(mockedStatsD.histogram('HistogramTests#histogramAfterAllDefaults', 1, objectContaining({}))).once();
+      verify(mockedStatsD.histogram('HistogramTests.histogramAfterAllDefaults', 1, objectContaining({}))).once();
     });
 
     it('should increment 1 by default', () => {
@@ -158,10 +158,10 @@ describe('Histogram', () => {
   });
 
   describe('HistogramOnErrorWrapper', () => {
-    it('should increment by 1 and use stats name as Class#methodName by default', () => {
+    it('should increment by 1 and use stats name as Class.methodName by default', () => {
       const test = new HistogramTests();
       expect(() => test.histogramOnErrorAllDefaults()).toThrow();
-      verify(mockedStatsD.histogram('HistogramTests#histogramOnErrorAllDefaults', 1, objectContaining({}))).once();
+      verify(mockedStatsD.histogram('HistogramTests.histogramOnErrorAllDefaults', 1, objectContaining({}))).once();
     });
 
     it('should increment 1 by default', () => {
@@ -240,21 +240,21 @@ describe('Histogram', () => {
         verify(attempted).calledBefore(success);
       });
 
-      it('should increment by 1 and use stats name as Class#methodName by default', () => {
+      it('should increment by 1 and use stats name as Class.methodName by default', () => {
         const test = new HistogramTests();
         test.histogramAroundSuccessAllDefaults();
 
         const attempted = mockedStatsD.histogram(
-            'HistogramTests#histogramAroundSuccessAllDefaults.attempted',
+            'HistogramTests.histogramAroundSuccessAllDefaults.attempted',
             1,
             objectContaining({}),
         );
         const success = mockedStatsD.histogram(
-            'HistogramTests#histogramAroundSuccessAllDefaults.success',
+            'HistogramTests.histogramAroundSuccessAllDefaults.success',
             1,
             objectContaining({}),
         );
-        const failure = mockedStatsD.histogram('HistogramTests#histogramAroundSuccessAllDefaults.failure', anything(), anything());
+        const failure = mockedStatsD.histogram('HistogramTests.histogramAroundSuccessAllDefaults.failure', anything(), anything());
         verify(attempted).once();
         verify(success).once();
         verify(failure).never();
@@ -398,22 +398,22 @@ describe('Histogram', () => {
         verify(attempted).calledBefore(failure);
       });
 
-      it('should increment by 1 and use stats name as Class#methodName by default', () => {
+      it('should increment by 1 and use stats name as Class.methodName by default', () => {
         const test = new HistogramTests();
         expect(() => test.histogramAroundFailureAllDefaults()).toThrow();
 
         const attempted = mockedStatsD.histogram(
-            'HistogramTests#histogramAroundFailureAllDefaults.attempted',
+            'HistogramTests.histogramAroundFailureAllDefaults.attempted',
             1,
             objectContaining({}),
         );
         const failure = mockedStatsD.histogram(
-            'HistogramTests#histogramAroundFailureAllDefaults.failure',
+            'HistogramTests.histogramAroundFailureAllDefaults.failure',
             1,
             objectContaining({}),
         );
         const success = mockedStatsD.histogram(
-            'HistogramTests#histogramAroundFailureAllDefaults.success',
+            'HistogramTests.histogramAroundFailureAllDefaults.success',
             anything(),
             anything(),
         );

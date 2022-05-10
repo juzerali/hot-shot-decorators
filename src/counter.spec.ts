@@ -11,11 +11,11 @@ describe('Increment', () => {
     });
 
     describe('IncrementBeforeWrapper', () => {
-        it('should increment by 1 and use stats name as Class#methodName by default', () => {
+        it('should increment by 1 and use stats name as Class.methodName by default', () => {
             const test = new CounterTests();
             const result = test.incBeforeAllDefaults();
             expect(result).toEqual("incBeforeAllDefaults.returnValue");
-            verify(mockedStatsD.increment('CounterTests#incBeforeAllDefaults', 1, objectContaining({}))).once();
+            verify(mockedStatsD.increment('CounterTests.incBeforeAllDefaults', 1, objectContaining({}))).once();
         });
 
         it('should increment 1 be default', () => {
@@ -87,11 +87,11 @@ describe('Increment', () => {
     });
 
     describe('IncrementAfterWrapper', () => {
-        it('should increment by 1 and use stats name as Class#methodName by default', () => {
+        it('should increment by 1 and use stats name as Class.methodName by default', () => {
             const test = new CounterTests();
             const result = test.incAfterAllDefaults();
             expect(result).toEqual("incAfterAllDefaults.returnValue");
-            verify(mockedStatsD.increment('CounterTests#incAfterAllDefaults', 1, objectContaining({}))).once();
+            verify(mockedStatsD.increment('CounterTests.incAfterAllDefaults', 1, objectContaining({}))).once();
         });
 
         it('should increment 1 by default', () => {
@@ -157,10 +157,10 @@ describe('Increment', () => {
     });
 
     describe('IncrementOnErrorWrapper', () => {
-        it('should increment by 1 and use stats name as Class#methodName by default', () => {
+        it('should increment by 1 and use stats name as Class.methodName by default', () => {
             const test = new CounterTests();
             expect(() => test.incOnErrorAllDefaults()).toThrow();
-            verify(mockedStatsD.increment('CounterTests#incOnErrorAllDefaults', 1, objectContaining({}))).once();
+            verify(mockedStatsD.increment('CounterTests.incOnErrorAllDefaults', 1, objectContaining({}))).once();
         });
 
         it('should increment 1 by default', () => {
@@ -239,21 +239,21 @@ describe('Increment', () => {
                 verify(attempted).calledBefore(success);
             });
 
-            it('should increment by 1 and use stats name as Class#methodName by default', () => {
+            it('should increment by 1 and use stats name as Class.methodName by default', () => {
                 const test = new CounterTests();
                 test.incAroundSuccessAllDefaults();
 
                 const attempted = mockedStatsD.increment(
-                    'CounterTests#incAroundSuccessAllDefaults.attempted',
+                    'CounterTests.incAroundSuccessAllDefaults.attempted',
                     1,
                     objectContaining({}),
                 );
                 const success = mockedStatsD.increment(
-                    'CounterTests#incAroundSuccessAllDefaults.success',
+                    'CounterTests.incAroundSuccessAllDefaults.success',
                     1,
                     objectContaining({}),
                 );
-                const failure = mockedStatsD.increment('CounterTests#incAroundSuccessAllDefaults.failure', anything(), anything());
+                const failure = mockedStatsD.increment('CounterTests.incAroundSuccessAllDefaults.failure', anything(), anything());
                 verify(attempted).once();
                 verify(success).once();
                 verify(failure).never();
@@ -397,22 +397,22 @@ describe('Increment', () => {
                 verify(attempted).calledBefore(failure);
             });
 
-            it('should increment by 1 and use stats name as Class#methodName by default', () => {
+            it('should increment by 1 and use stats name as Class.methodName by default', () => {
                 const test = new CounterTests();
                 expect(() => test.incAroundFailureAllDefaults()).toThrow();
 
                 const attempted = mockedStatsD.increment(
-                    'CounterTests#incAroundFailureAllDefaults.attempted',
+                    'CounterTests.incAroundFailureAllDefaults.attempted',
                     1,
                     objectContaining({}),
                 );
                 const failure = mockedStatsD.increment(
-                    'CounterTests#incAroundFailureAllDefaults.failure',
+                    'CounterTests.incAroundFailureAllDefaults.failure',
                     1,
                     objectContaining({}),
                 );
                 const success = mockedStatsD.increment(
-                    'CounterTests#incAroundFailureAllDefaults.success',
+                    'CounterTests.incAroundFailureAllDefaults.success',
                     anything(),
                     anything(),
                 );
