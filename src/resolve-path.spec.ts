@@ -32,4 +32,22 @@ describe('resolvePath', () => {
     const result = resolvePath(x, nonExistantPath);
     expect(result.value).toBeUndefined();
   });
+
+  it('should resolve path for nested classes', () => {
+    class A {
+      constructor(public readonly value = "X") {
+      }
+    }
+    class B {
+      constructor(public readonly a: A) {}
+    }
+    class C {
+      constructor(public readonly b: B) {}
+    }
+
+    const c = new C(new B(new A("Z")))
+    const path = 'b.a.value';
+    const result = resolvePath(c, path);
+    expect(result.value).toEqual("Z");
+  });
 });
