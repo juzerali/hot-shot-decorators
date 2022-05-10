@@ -190,6 +190,22 @@ describe('Increment', () => {
             ).once();
         });
 
+        it('should report with derived tags', () => {
+            const test = new CounterTests();
+            expect(() => test.incOnErrorWithDerivedTags("arg-tag")).toThrow();
+            verify(
+                mockedStatsD.increment(
+                    'onerror.with.derived.tags',
+                    40,
+                    objectContaining({
+                        arg: 'arg-tag',
+                        constTag: 'const-tag',
+                        error: 'error-1',
+                    }),
+                ),
+            ).once();
+        });
+
         it('should inspect arguments', () => {
             const test = new CounterTests();
             expect(() => test.incOnErrorWithArgs({a: {deeply: {nested: {property: [0, 1, 2, 3, 87]}}}})).toThrow();

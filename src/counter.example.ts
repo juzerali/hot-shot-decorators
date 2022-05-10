@@ -114,6 +114,12 @@ export class CounterTests {
         this.throwError();
     }
 
+    /** Don't add error.message as tag in production, tag should have low cardinality **/
+    @IncrementOnError('onerror.with.derived.tags', 40, (arg: string, error: any) => {return {arg, constTag: 'const-tag', error: error.message}})
+    public incOnErrorWithDerivedTags(arg: string) {
+       throw new Error("error-1");
+    }
+
     @IncrementOnError('onerror.with.args', '0.a.deeply.nested.property.4')
     public incOnErrorWithArgs(arg1: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
