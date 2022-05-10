@@ -80,7 +80,7 @@ class MyService {
         // If the method call throws, "around.failure" is incremented with the same value
     }
 
-    @IncrementAfter("payment_done", (payment: PaymentDto) => payment.amount)
+    @IncrementAfter("payment_failed", (payment: PaymentDto) => payment.amount)
     public incrementOnErrorWithArgs(payment: PaymentDto) {
         // increments "payment_done" metric after the method call completes successfully 
         // value derived from lambda function passed as value. 
