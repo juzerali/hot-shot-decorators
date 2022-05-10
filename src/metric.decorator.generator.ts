@@ -21,21 +21,21 @@ export class MetricDecoratorGenerator {
      * Generates @IncrementBefore decorator that increments before method execution
      */
     public incBefore() {
-        return this.reportBefore((...args: StatsdArgs) => this.statsd.increment.apply(this.statsd, args));
+        return this.reportBefore(this.statsd.increment);
     }
 
     /**
      * Generates @IncrementAfter decorator that increments after successful method execution
      */
     public incAfter() {
-        return this.reportAfter((...args: StatsdArgs) => this.statsd.increment.apply(this.statsd, args));
+        return this.reportAfter(this.statsd.increment);
     }
 
     /**
      * Generates @IncrementOnError decorator that increments when method execution throws error
      */
     public incOnError() {
-        return this.reportOnError((...args: StatsdArgs) => this.statsd.increment.apply(this.statsd, args));
+        return this.reportOnError(this.statsd.increment);
     }
 
     /**
@@ -43,28 +43,28 @@ export class MetricDecoratorGenerator {
      * `attempted`, `successful`, and `failed` suffixes respectively.
      */
     public incAround() {
-        return this.reportAround((...args: StatsdArgs) => this.statsd.increment.apply(this.statsd, args));
+        return this.reportAround(this.statsd.increment);
     }
 
     /**
      * Generates @HistogramBefore decorator that reports histogram before method execution
      */
     public histogramBefore() {
-        return this.reportBefore((...args: StatsdArgs) => this.statsd.histogram.apply(this.statsd, args));
+        return this.reportBefore(this.statsd.histogram);
     }
 
     /**
      * Generates @HistogramAfter decorator that reports histogram after successful method execution
      */
     public histogramAfter() {
-        return this.reportAfter((...args: StatsdArgs) => this.statsd.histogram.apply(this.statsd, args));
+        return this.reportAfter(this.statsd.histogram);
     }
 
     /**
      * Generates @HistogramOnError decorator that reports histogram when method execution throws error
      */
     public histogramOnError() {
-        return this.reportOnError((...args: StatsdArgs) => this.statsd.histogram.apply(this.statsd, args));
+        return this.reportOnError(this.statsd.histogram);
     }
 
     /**
@@ -72,7 +72,7 @@ export class MetricDecoratorGenerator {
      * with `attempted`, `successful`, and `failed` suffixes respectively.
      */
     public histogramAround() {
-        return this.reportAround((...args: StatsdArgs) => this.statsd.histogram.apply(this.statsd, args));
+        return this.reportAround(this.statsd.histogram);
     }
 
     /**
