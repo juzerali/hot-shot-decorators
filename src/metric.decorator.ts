@@ -1,17 +1,6 @@
 import {StatsD} from "hot-shots";
 import {spy} from "ts-mockito";
-import {
-    IncrementAfterWrapper,
-    IncrementAroundWrapper,
-    IncrementBeforeWrapper,
-    IncrementOnErrorWrapper
-} from "./counter";
-import {
-    HistogramAfterWrapper,
-    HistogramAroundWrapper,
-    HistogramBeforeWrapper,
-    HistogramOnErrorWrapper
-} from "./histogram";
+import {MetricDecoratorWrapper} from "./metric.decorator.wrapper";
 
 /**
  * Copy this file in your project and make necessary changes
@@ -35,14 +24,15 @@ export const statsdClient = new StatsD(hotShotConfig);
  * Skip the following line from your setup, this is only for tests.
  */
 export const mockedStatsD = spy(statsdClient);
+const wrapper = new MetricDecoratorWrapper(statsdClient);
 
-export const IncrementBefore = IncrementBeforeWrapper(statsdClient);
-export const IncrementAfter = IncrementAfterWrapper(statsdClient);
-export const IncrementOnError = IncrementOnErrorWrapper(statsdClient);
-export const IncrementAround = IncrementAroundWrapper(statsdClient);
+export const IncrementBefore = wrapper.incBefore();
+export const IncrementAfter = wrapper.incAfter();
+export const IncrementOnError = wrapper.incOnError();
+export const IncrementAround = wrapper.incAround();
 
-export const HistogramBefore = HistogramBeforeWrapper(statsdClient);
-export const HistogramAfter = HistogramAfterWrapper(statsdClient);
-export const HistogramOnError = HistogramOnErrorWrapper(statsdClient);
-export const HistogramAround = HistogramAroundWrapper(statsdClient);
+export const HistogramBefore = wrapper.histogramBefore();
+export const HistogramAfter = wrapper.histogramAfter();
+export const HistogramOnError = wrapper.histogramOnError();
+export const HistogramAround = wrapper.histogramAround();
 

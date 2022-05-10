@@ -1,3 +1,2 @@
-export * from './counter'
-export * from './histogram'
+export * from './metric.decorator.wrapper'
 export {ValueDerivation} from "./util";
