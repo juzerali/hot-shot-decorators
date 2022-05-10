@@ -21,7 +21,7 @@ Copy following to `metric.decorator.ts`
 
 import { StatsD } from 'hot-shots';
 import {
-  MetricDecoratorWrapper
+  MetricDecoratorGenerator
 } from 'hot-shots-decorator';
 
 const hotShotConfig = {
@@ -35,17 +35,17 @@ const hotShotConfig = {
 
 const client = new StatsD(hotShotConfig);
 
-const wrapper = new MetricDecoratorWrapper(statsdClient);
+const generator = new MetricDecoratorGenerator(statsdClient);
 
-export const IncrementBefore = wrapper.incBefore();
-export const IncrementAfter = wrapper.incAfter();
-export const IncrementOnError = wrapper.incOnError();
-export const IncrementAround = wrapper.incAround();
+export const IncrementBefore = generator.incBefore();
+export const IncrementAfter = generator.incAfter();
+export const IncrementOnError = generator.incOnError();
+export const IncrementAround = generator.incAround();
 
-export const HistogramBefore = wrapper.histogramBefore();
-export const HistogramAfter = wrapper.histogramAfter();
-export const HistogramOnError = wrapper.histogramOnError();
-export const HistogramAround = wrapper.histogramAround();
+export const HistogramBefore = generator.histogramBefore();
+export const HistogramAfter = generator.histogramAfter();
+export const HistogramOnError = generator.histogramOnError();
+export const HistogramAround = generator.histogramAround();
 ```
 *NOTE: The decorators will never throw any error and fail silently, in most cases defaulting to value 1*
 #### Add decorators to methods

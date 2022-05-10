@@ -1,6 +1,6 @@
 import {StatsD} from "hot-shots";
 import {spy} from "ts-mockito";
-import {MetricDecoratorWrapper} from "./metric.decorator.wrapper";
+import {MetricDecoratorGenerator} from "./metric.decorator.generator";
 
 /**
  * Copy this file in your project and make necessary changes
@@ -24,15 +24,15 @@ export const statsdClient = new StatsD(hotShotConfig);
  * Skip the following line from your setup, this is only for tests.
  */
 export const mockedStatsD = spy(statsdClient);
-const wrapper = new MetricDecoratorWrapper(statsdClient);
+const generator = new MetricDecoratorGenerator(statsdClient);
 
-export const IncrementBefore = wrapper.incBefore();
-export const IncrementAfter = wrapper.incAfter();
-export const IncrementOnError = wrapper.incOnError();
-export const IncrementAround = wrapper.incAround();
+export const IncrementBefore = generator.incBefore();
+export const IncrementAfter = generator.incAfter();
+export const IncrementOnError = generator.incOnError();
+export const IncrementAround = generator.incAround();
 
-export const HistogramBefore = wrapper.histogramBefore();
-export const HistogramAfter = wrapper.histogramAfter();
-export const HistogramOnError = wrapper.histogramOnError();
-export const HistogramAround = wrapper.histogramAround();
+export const HistogramBefore = generator.histogramBefore();
+export const HistogramAfter = generator.histogramAfter();
+export const HistogramOnError = generator.histogramOnError();
+export const HistogramAround = generator.histogramAround();
 
