@@ -321,6 +321,43 @@ describe('Increment', () => {
                 verify(attempted).calledBefore(success);
             });
 
+            it('should report with derived tags', () => {
+                const test = new CounterTests();
+                const result = test.incAroundSuccessWithDerivedTags('arg-tag');
+
+                expect(result).toEqual({tags: {'returnValue': 'incAroundSuccessWithDerivedTags.returnValue'}});
+
+                const attempted = mockedStatsD.increment(
+                    'around.with.derived.tags.attempted',
+                    40,
+                    objectContaining({
+                        constTag: 'const-tag',
+                        arg: 'arg-tag',
+                    }),
+                );
+
+                const success = mockedStatsD.increment(
+                    'around.with.derived.tags.success',
+                    40,
+                    objectContaining({
+                        constTag: 'const-tag',
+                        arg: 'arg-tag',
+                        returnValue: 'incAroundSuccessWithDerivedTags.returnValue'
+                    }),
+                );
+
+                const failure = mockedStatsD.increment(
+                    'around.with.tags.failure',
+                    anything(),
+                    anything()
+                );
+
+                verify(attempted).once();
+                verify(success).once();
+                verify(failure).never();
+                verify(attempted).calledBefore(success);
+            });
+
             it('should inspect arguments', () => {
                 const test = new CounterTests();
                 test.incAroundSuccessWithArgs({a: {deeply: {nested: {property: 91}}}});
@@ -441,6 +478,41 @@ describe('Increment', () => {
 
                 verify(success).never();
                 verify(attempted).once();
+                verify(failure).once();
+                verify(attempted).calledBefore(failure);
+            });
+
+            it('should report with derived tags', () => {
+                const test = new CounterTests();
+                expect( () => test.incAroundFailureWithDerivedTags('arg-tag')).toThrow();
+
+                const attempted = mockedStatsD.increment(
+                    'around.with.derived.tags.attempted',
+                    40,
+                    objectContaining({
+                        constTag: 'const-tag',
+                        arg: 'arg-tag',
+                    }),
+                );
+
+                const failure = mockedStatsD.increment(
+                    'around.with.derived.tags.failure',
+                    40,
+                    objectContaining({
+                        constTag: 'const-tag',
+                        arg: 'arg-tag',
+                        error: 'error-1'
+                    }),
+                );
+
+                const success = mockedStatsD.increment(
+                    'around.with.tags.success',
+                    anything(),
+                    anything()
+                );
+
+                verify(attempted).once();
+                verify(success).never();
                 verify(failure).once();
                 verify(attempted).calledBefore(failure);
             });

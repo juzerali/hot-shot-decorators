@@ -152,6 +152,17 @@ export class HistogramTests {
     @HistogramAround('around.with.tags', 40, {type: 'Payout', gateway: 'Stripe'})
     public histogramAroundSuccessWithTags() {}
 
+    @HistogramAround('around.with.derived.tags', 40, (arg: string, returnValueOrError?: any) => {
+        const tags = {arg, constTag: 'const-tag'};
+        if(!returnValueOrError) return tags;
+        return returnValueOrError instanceof Error ?
+            {...tags, error: returnValueOrError.message} :
+            {...tags, returnValue: returnValueOrError.tags.returnValue}
+    })
+    public histogramAroundSuccessWithDerivedTags(arg: string): ReturnValue {
+        return {tags: {'returnValue': "histogramAroundSuccessWithDerivedTags.returnValue"}};
+    }
+
     @HistogramAround('around.with.args', '0.a.deeply.nested.property')
     public histogramAroundSuccessWithArgs(arg1: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
@@ -182,6 +193,17 @@ export class HistogramTests {
         this.throwError();
     }
 
+    @HistogramAround('around.with.derived.tags', 40, (arg: string, returnValueOrError?: any) => {
+        const tags = {arg, constTag: 'const-tag'};
+        if(!returnValueOrError) return tags;
+        return returnValueOrError instanceof Error ?
+            {...tags, error: returnValueOrError.message} :
+            {...tags, returnValue: returnValueOrError.tags.returnValue}
+    })
+    public histogramAroundFailureWithDerivedTags(arg: string):  ReturnValue {
+        throw new Error("error-1");
+    }
+
     @HistogramAround('around.with.args', '0.a.deeply.nested.property')
     public histogramAroundFailureWithArgs(arg1: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
@@ -194,3 +216,5 @@ export class HistogramTests {
         this.throwError();
     }
 }
+
+type ReturnValue = { tags: {}};

@@ -1,6 +1,7 @@
 import {anything, objectContaining, resetCalls, verify} from 'ts-mockito';
 import {mockedStatsD} from "./metric.decorator";
 import {HistogramTests} from "./histogram.example";
+import {CounterTests} from "./counter.example";
 
 describe('Histogram', () => {
   // const mockedStatsD: StatsD = mock(StatsD);
@@ -321,6 +322,43 @@ describe('Histogram', () => {
         verify(attempted).calledBefore(success);
       });
 
+      it('should report with derived tags', () => {
+        const test = new HistogramTests();
+        const result = test.histogramAroundSuccessWithDerivedTags('arg-tag');
+
+        expect(result).toEqual({tags: {'returnValue': 'histogramAroundSuccessWithDerivedTags.returnValue'}});
+
+        const attempted = mockedStatsD.histogram(
+            'around.with.derived.tags.attempted',
+            40,
+            objectContaining({
+              constTag: 'const-tag',
+              arg: 'arg-tag',
+            }),
+        );
+
+        const success = mockedStatsD.histogram(
+            'around.with.derived.tags.success',
+            40,
+            objectContaining({
+              constTag: 'const-tag',
+              arg: 'arg-tag',
+              returnValue: 'histogramAroundSuccessWithDerivedTags.returnValue'
+            }),
+        );
+
+        const failure = mockedStatsD.histogram(
+            'around.with.tags.failure',
+            anything(),
+            anything()
+        );
+
+        verify(attempted).once();
+        verify(success).once();
+        verify(failure).never();
+        verify(attempted).calledBefore(success);
+      });
+
       it('should inspect arguments', () => {
         const test = new HistogramTests();
         test.histogramAroundSuccessWithArgs({a: {deeply: {nested: {property: 91}}}});
@@ -441,6 +479,41 @@ describe('Histogram', () => {
 
         verify(success).never();
         verify(attempted).once();
+        verify(failure).once();
+        verify(attempted).calledBefore(failure);
+      });
+
+      it('should report with derived tags', () => {
+        const test = new HistogramTests();
+        expect( () => test.histogramAroundFailureWithDerivedTags('arg-tag')).toThrow();
+
+        const attempted = mockedStatsD.histogram(
+            'around.with.derived.tags.attempted',
+            40,
+            objectContaining({
+              constTag: 'const-tag',
+              arg: 'arg-tag',
+            }),
+        );
+
+        const failure = mockedStatsD.histogram(
+            'around.with.derived.tags.failure',
+            40,
+            objectContaining({
+              constTag: 'const-tag',
+              arg: 'arg-tag',
+              error: 'error-1'
+            }),
+        );
+
+        const success = mockedStatsD.histogram(
+            'around.with.tags.success',
+            anything(),
+            anything()
+        );
+
+        verify(attempted).once();
+        verify(success).never();
         verify(failure).once();
         verify(attempted).calledBefore(failure);
       });

@@ -26,7 +26,9 @@ export class CounterTests {
     }
 
 
-    @IncrementBefore('before.with.derived.tags', 39, (arg: string) => {return {arg, constTag: 'const-tag'}})
+    @IncrementBefore('before.with.derived.tags', 39, (arg: string) => {
+        return {arg, constTag: 'const-tag'}
+    })
     public incBeforeWithDerivedTags(arg: string) {
         return 'incBeforeWithDerivedTags.returnValue';
     }
@@ -72,7 +74,9 @@ export class CounterTests {
         return 'incAfterWithTags.returnValue';
     }
 
-    @IncrementAfter('after.with.derived.tags', 40, (arg: string, returnValue: string) => {return {arg, returnValue, constTag: 'const-tag'}})
+    @IncrementAfter('after.with.derived.tags', 40, (arg: string, returnValue: string) => {
+        return {arg, returnValue, constTag: 'const-tag'}
+    })
     public incAfterWithDerivedTags(arg: string): string {
         return 'incAfterWithDerivedTags.returnValue';
     }
@@ -115,9 +119,11 @@ export class CounterTests {
     }
 
     /** Don't add error.message as tag in production, tag should have low cardinality **/
-    @IncrementOnError('onerror.with.derived.tags', 40, (arg: string, error: any) => {return {arg, constTag: 'const-tag', error: error.message}})
+    @IncrementOnError('onerror.with.derived.tags', 40, (arg: string, error: any) => {
+        return {arg, constTag: 'const-tag', error: error.message}
+    })
     public incOnErrorWithDerivedTags(arg: string) {
-       throw new Error("error-1");
+        throw new Error("error-1");
     }
 
     @IncrementOnError('onerror.with.args', '0.a.deeply.nested.property.4')
@@ -154,6 +160,17 @@ export class CounterTests {
     public incAroundSuccessWithTags() {
     }
 
+    @IncrementAround('around.with.derived.tags', 40, (arg: string, returnValueOrError?: any) => {
+        const tags = {arg, constTag: 'const-tag'};
+        if(!returnValueOrError) return tags;
+        return returnValueOrError instanceof Error ?
+            {...tags, error: returnValueOrError.message} :
+            {...tags, returnValue: returnValueOrError.tags.returnValue}
+    })
+    public incAroundSuccessWithDerivedTags(arg: string): { tags: {} } {
+        return {tags: {'returnValue': "incAroundSuccessWithDerivedTags.returnValue"}};
+    }
+
     @IncrementAround('around.with.args', '0.a.deeply.nested.property')
     public incAroundSuccessWithArgs(arg1: object) {
         console.log('Argument was: ' + JSON.stringify(arg1));
@@ -182,6 +199,17 @@ export class CounterTests {
     @IncrementAround('around.with.tags', 40, {type: 'Payout', gateway: 'Stripe'})
     public incAroundFailureWithTags() {
         this.throwError();
+    }
+
+    @IncrementAround('around.with.derived.tags', 40, (arg: string, returnValueOrError?: any) => {
+        const tags = {arg, constTag: 'const-tag'};
+        if(!returnValueOrError) return tags;
+        return returnValueOrError instanceof Error ?
+            {...tags, error: returnValueOrError.message} :
+            {...tags, returnValue: returnValueOrError.tags.returnValue}
+    })
+    public incAroundFailureWithDerivedTags(arg: string): { tag: { string: string } } {
+        throw new Error("error-1");
     }
 
     @IncrementAround('around.with.args', '0.a.deeply.nested.property')
