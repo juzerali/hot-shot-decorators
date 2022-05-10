@@ -114,3 +114,6 @@ The function will be called for getting the value
 If all attempts to number resolution fail, it will default to 1. An error will be printed to console.
 
 For detailed usage, see specs
+
+## Generator
+![Genertor](docs/Generator.svg)
