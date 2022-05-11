@@ -11,7 +11,7 @@ npm test
 ## Usage guide
 #### Add dependency
 ```shell script
-npm install --save hot-shots-decorators
+npm install --save @clipboard-health/hot-shot-decorators
 ```
 
 #### Create decorators
