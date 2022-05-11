@@ -1,4 +1,4 @@
-# hot-shots-decorators
+# hot-shot-decorators
 
 Provides decorators for reporting metrics using statsd.
 
