@@ -1,6 +1,6 @@
 {
   "name": "hot-shots-decorators",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Typescript decorators for metric reportage",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/juzerali/hot-shots-decorator.git"
+    "url": "git+https://@github.com:ClipboardHealth/hot-shot-decorators.git"
   },
   "keywords": [
     "metrics",
@@ -21,9 +21,9 @@
   "author": "Juzer Ali",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/juzerali/hot-shots-decorator/issues"
+    "url": "https://github.com/ClipboardHealth/hot-shots-decorator/issues"
   },
-  "homepage": "https://github.com/juzerali/hot-shots-decorator#readme",
+  "homepage": "https://github.com/ClipboardHealth/hot-shots-decorator#readme",
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.3.0",
     "@babel/preset-env": "^7.17.10",
