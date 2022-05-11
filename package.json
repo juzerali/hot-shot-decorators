@@ -1,6 +1,6 @@
 {
   "name": "@clipboard-health/hot-shot-decorators",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Typescript decorators for metric reportage",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,7 @@
   "bugs": {
     "url": "https://github.com/ClipboardHealth/hot-shots-decorator/issues"
   },
-  "homepage": "https://github.com/ClipboardHealth/hot-shots-decorator#readme",
+  "homepage": "https://github.com/ClipboardHealth/hot-shot-decorators#readme",
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.3.0",
     "@babel/preset-env": "^7.17.10",
