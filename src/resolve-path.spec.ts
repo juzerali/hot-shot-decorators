@@ -35,8 +35,7 @@ describe('resolvePath', () => {
 
   it('should resolve path for nested classes', () => {
     class A {
-      constructor(public readonly value = "X") {
-      }
+      constructor(public readonly value = 'X') {}
     }
     class B {
       constructor(public readonly a: A) {}
@@ -45,9 +44,9 @@ describe('resolvePath', () => {
       constructor(public readonly b: B) {}
     }
 
-    const c = new C(new B(new A("Z")))
+    const c = new C(new B(new A('Z')));
     const path = 'b.a.value';
     const result = resolvePath(c, path);
-    expect(result.value).toEqual("Z");
+    expect(result.value).toEqual('Z');
   });
 });
