@@ -1,6 +1,6 @@
 {
-  "name": "hot-shots-decorators",
-  "version": "0.2.0",
+  "name": "@clipboard-health/hot-shot-decorators",
+  "version": "0.2.1",
   "description": "Typescript decorators for metric reportage",
   "main": "index.js",
   "scripts": {
