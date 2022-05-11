@@ -1,8 +1,10 @@
 import {resolvePath} from 'path-value';
 import {Tags} from 'hot-shots';
 
-export type TagDerivation = Tags | Function | undefined;
-export type ValueDerivation = number | string | Function | undefined;
+export type TagDerivation = Tags | TagDerivationFunc | undefined;
+export type ValueDerivation = number | string | ValueDerivationFunc | undefined;
+type ValueDerivationFunc = (...args: any[])  => number;
+type TagDerivationFunc = (...args: any[])  => Tags;
 
 /**
  * Helper function that determines metric name. If empty or undefined metric name is passed, Classname#methodName will
@@ -16,12 +18,12 @@ export function getMetricName(name: string, target: any, descriptor: PropertyDes
     return (name && name.length !== 0) ? name : target.constructor.name + '.' + descriptor.value.name;
 }
 
-function numericValueResolver(actualValue: number, value: number | string | Function) {
+function numericValueResolver(actualValue: number, value: number | string | ValueDerivation) {
     actualValue = value as number;
     return actualValue;
 }
 
-function functionValueResolver(value: Function, args: any, actualValue: number) {
+function functionValueResolver(value: ValueDerivationFunc, args: any, actualValue: number) {
     {
         const result = value.apply(null, args);
         if (Number.isFinite(result)) {
@@ -73,7 +75,7 @@ export function resolveValue(value: ValueDerivation, args: any) {
     return actualValue;
 }
 
-function functionTagResolver(tags: Function, args: any): Tags {
+function functionTagResolver(tags: TagDerivationFunc, args: any): Tags {
     return tags.apply(null, args);
 }
 

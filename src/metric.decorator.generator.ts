@@ -43,7 +43,7 @@ export class MetricDecoratorGenerator {
      * `attempted`, `successful`, and `failed` suffixes respectively.
      */
     public incAround() {
-        return this.reportAround(this.statsd.increment);
+        return this.reportAround(this.statsd.increment, this.statsd.increment, this.statsd.increment);
     }
 
     /**
@@ -72,7 +72,7 @@ export class MetricDecoratorGenerator {
      * with `attempted`, `successful`, and `failed` suffixes respectively.
      */
     public histogramAround() {
-        return this.reportAround(this.statsd.histogram);
+        return this.reportAround(this.statsd.histogram, this.statsd.histogram, this.statsd.histogram);
     }
 
     /**
@@ -82,19 +82,7 @@ export class MetricDecoratorGenerator {
      * @private
      */
     private reportBefore(report: Function) {
-        return (name = '', value?: ValueDerivation, tagsDerivation:TagDerivation = {}): MethodDecorator => {
-            return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor => {
-                const original = descriptor.value;
-                const metric = getMetricName(name, target, descriptor);
-                descriptor.value = (...args: any) => {
-                    const actualValue = resolveValue(value, args);
-                    const tags = resolveTags(tagsDerivation, args);
-                    report(metric, actualValue, tags);
-                    return original.apply(this, args);
-                };
-                return descriptor;
-            };
-        };
+        return this.reportAround(report, undefined, undefined, "", "", "");
     };
 
     /**
@@ -103,23 +91,8 @@ export class MetricDecoratorGenerator {
      * @param report This function will be called after method execution with StatsdArgs
      * @private
      */
-    private reportAfter(report: Function)  {
-        return (name = '', value?: ValueDerivation, tagsDerivation:TagDerivation = {}): MethodDecorator => {
-            return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor => {
-                const original = descriptor.value;
-                const metric = getMetricName(name, target, descriptor);
-                descriptor.value = (...args: any) => {
-                    const returnValue = original.apply(this, args);
-
-                    const actualValue = resolveValue(value, [...args, returnValue]);
-                    const tags = resolveTags(tagsDerivation, [...args, returnValue]);
-                    report(metric, actualValue, tags);
-
-                    return returnValue;
-                };
-                return descriptor;
-            };
-        };
+    private reportAfter(report: Function) {
+        return this.reportAround(undefined, report, undefined, "", "", "");
     };
 
     /**
@@ -129,58 +102,54 @@ export class MetricDecoratorGenerator {
      * @private
      */
     private reportOnError(report: Function) {
-        return (name = '', value?: ValueDerivation, tagsDerivation:TagDerivation = {}): MethodDecorator => {
-            return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor => {
-                const original = descriptor.value;
-                const metric = getMetricName(name, target, descriptor);
-                descriptor.value = (...args: any) => {
-                    try {
-                        return original.apply(this, args);
-                    } catch (error) {
-                        const actualValue = resolveValue(value, [...args, error]);
-                        const tags = resolveTags(tagsDerivation, [...args, error]);
-                        report(metric, actualValue, tags);
-
-                        throw error;
-                    }
-                };
-                return descriptor;
-            };
-        };
+        return this.reportAround(undefined, undefined, report, "", "", "");
     };
 
     /**
      * Abstraction that wraps metric calls before, after method execution or when method execution throws error
      *
-     * @param report This function will be called before, after method execution or when method execution throws error
-     * with value property suffixed with `.attempted`, `.successful`, and `.failed` respectively
+     * @param before this function will be called before target method execution with StatsDArgs
+     * @param after function will be called after target method execution with StatsDArgs
+     * @param onError function will be called with StatsDArgs when target method execution throws
+     * @param beforeSuffix suffix to add to before metric name (default: `.attempted`)
+     * @param afterSuffix suffix to add to after metric name (default: `.successful`)
+     * @param errorSuffix suffix to add to onError metric name (default: `.failure`)
      * @private
      */
-    private reportAround(report: Function) {
-        return (name = '', value?: ValueDerivation, tagsDerivation:TagDerivation = {}): MethodDecorator => {
+    private reportAround(before: Function | undefined, after: Function | undefined, onError: Function | undefined,
+                         beforeSuffix = ".attempted", afterSuffix = ".success", errorSuffix = ".failure") {
+        return (name = '', value?: ValueDerivation, tagsDerivation: TagDerivation = {}): MethodDecorator => {
             return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor => {
                 const original = descriptor.value;
+
+                // Resolve metric name
                 const metric = getMetricName(name, target, descriptor);
-                const attempted = metric + '.attempted';
-                const success = metric + '.success';
-                const failure = metric + '.failure';
+
+                const attempted = metric + beforeSuffix;
+                const success = metric + afterSuffix;
+                const failure = metric + errorSuffix;
+
+                // Wrap original method call in around decorator be reassigning descriptor value
                 descriptor.value = (...args: any) => {
                     try {
-                        const actualValueBefore = resolveValue(value, args);
-                        let tags = resolveTags(tagsDerivation, args);
-                        report(attempted, actualValueBefore, tags);
+                        // Process before decorator
+                        this.runAdvice(before, value, args, tagsDerivation, attempted);
+
+                        /**
+                         *  👇Original method on which this decorator applies is called here👇
+                         */
                         const returnValue = original.apply(this, args);
 
-                        tags = resolveTags(tagsDerivation, [...args, returnValue]);
-                        const actualValueAfter = resolveValue(value, [...args, returnValue]);
-                        report(success, actualValueAfter, tags);
+                        // Process after decorator
+                        this.runAdvice(after, value, [...args, returnValue], tagsDerivation, success);
 
+                        // Return value returned by original method (⚠️ Don't forget this, it could break target application behaviour)
                         return returnValue;
                     } catch (error) {
-                        const actualValueOnError = resolveValue(value, [...args, error]);
-                        const tags = resolveTags(tagsDerivation, [...args, error]);
-                        report(failure, actualValueOnError, tags);
+                        // Process onError decorator
+                        this.runAdvice(onError, value, [...args, error], tagsDerivation, failure);
 
+                        // Rethrow error thrown by original method (⚠️ Don't forget this, it could break target application behaviour))
                         throw error;
                     }
                 };
@@ -188,4 +157,12 @@ export class MetricDecoratorGenerator {
             };
         };
     };
+
+    private runAdvice(func: Function | undefined, value: number | string | ((...args: any[]) => number) | undefined, args: any, tagsDerivation: { [p: string]: string } | string[] | ((...args: any[]) => Tags) | undefined, metric: string) {
+        if (func) {
+            const actualValue = resolveValue(value, args);
+            const tags = resolveTags(tagsDerivation, args);
+            func(metric, actualValue, tags);
+        }
+    }
 }
