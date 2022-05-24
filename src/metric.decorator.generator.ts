@@ -177,9 +177,13 @@ export class MetricDecoratorGenerator {
     metric: string,
   ) {
     if (func) {
-      const actualValue = resolveValue(value, args);
-      const tags = resolveTags(tagsDerivation, args);
-      func.call(this.statsd, metric, actualValue, tags);
+      try {
+        const actualValue = resolveValue(value, args);
+        const tags = resolveTags(tagsDerivation, args);
+        func.call(this.statsd, metric, actualValue, tags);
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 }
