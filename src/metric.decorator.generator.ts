@@ -179,7 +179,7 @@ export class MetricDecoratorGenerator {
     if (func) {
       const actualValue = resolveValue(value, args);
       const tags = resolveTags(tagsDerivation, args);
-      func(metric, actualValue, tags);
+      func.call(this.statsd, metric, actualValue, tags);
     }
   }
 }
