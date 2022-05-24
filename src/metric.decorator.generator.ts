@@ -1,5 +1,5 @@
-import { StatsCb, StatsD, Tags } from 'hot-shots';
-import { getMetricName, resolveTags, resolveValue, TagDerivation, ValueDerivation } from './util';
+import {StatsCb, StatsD, Tags} from 'hot-shots';
+import {getMetricName, resolveTags, resolveValue, TagDerivation, ValueDerivation} from './util';
 
 type StatsdArgs = [
   stat: string | string[],
@@ -23,24 +23,56 @@ export class MetricDecoratorGenerator {
   ) {}
 
   /**
+   * Generates a decorator that executes advice before method execution
+   * @param advice - advice to run
+   */
+  public before(advice: Function) {
+    return this.beforeDecorator(advice);
+  }
+
+  /**
+   * Generates a decorator that executes advice after method execution
+   * @param advice - advice to run
+   */
+  public after(advice: Function) {
+    return this.afterDecorator(advice);
+  }
+
+  /**
+   * Generates a decorator that executes advice when method execution throws
+   * @param advice - advice to run
+   */
+  public onError(advice: Function) {
+    return this.onErrorDecorator(advice);
+  }
+
+  /**
+   * Generates a decorator that executes advice before method execution
+   * @param advice - advice to run
+   */
+  public around(beforeAdvice: Function, afterAdvice: Function, onErrorAdvice: Function) {
+    return this.aroundDecorator(beforeAdvice, afterAdvice, onErrorAdvice);
+  }
+
+  /**
    * Generates @IncrementBefore decorator that increments before method execution
    */
   public incBefore() {
-    return this.reportBefore(this.statsd.increment);
+    return this.before(this.statsd.increment);
   }
 
   /**
    * Generates @IncrementAfter decorator that increments after successful method execution
    */
   public incAfter() {
-    return this.reportAfter(this.statsd.increment);
+    return this.after(this.statsd.increment);
   }
 
   /**
    * Generates @IncrementOnError decorator that increments when method execution throws error
    */
   public incOnError() {
-    return this.reportOnError(this.statsd.increment);
+    return this.onError(this.statsd.increment);
   }
 
   /**
@@ -48,28 +80,28 @@ export class MetricDecoratorGenerator {
    * `attempted`, `successful`, and `failed` suffixes respectively.
    */
   public incAround() {
-    return this.reportAround(this.statsd.increment, this.statsd.increment, this.statsd.increment);
+    return this.around(this.statsd.increment, this.statsd.increment, this.statsd.increment);
   }
 
   /**
    * Generates @HistogramBefore decorator that reports histogram before method execution
    */
   public histogramBefore() {
-    return this.reportBefore(this.statsd.histogram);
+    return this.before(this.statsd.histogram);
   }
 
   /**
    * Generates @HistogramAfter decorator that reports histogram after successful method execution
    */
   public histogramAfter() {
-    return this.reportAfter(this.statsd.histogram);
+    return this.after(this.statsd.histogram);
   }
 
   /**
    * Generates @HistogramOnError decorator that reports histogram when method execution throws error
    */
   public histogramOnError() {
-    return this.reportOnError(this.statsd.histogram);
+    return this.onError(this.statsd.histogram);
   }
 
   /**
@@ -77,7 +109,7 @@ export class MetricDecoratorGenerator {
    * with `attempted`, `successful`, and `failed` suffixes respectively.
    */
   public histogramAround() {
-    return this.reportAround(this.statsd.histogram, this.statsd.histogram, this.statsd.histogram);
+    return this.around(this.statsd.histogram, this.statsd.histogram, this.statsd.histogram);
   }
 
   /**
@@ -86,8 +118,8 @@ export class MetricDecoratorGenerator {
    * @param report This function will be called before method execution with StatsdArgs
    * @private
    */
-  private reportBefore(report: Function) {
-    return this.reportAround(report, undefined, undefined, '', '', '');
+  private beforeDecorator(report: Function) {
+    return this.aroundDecorator(report, undefined, undefined, '', '', '');
   }
 
   /**
@@ -96,8 +128,8 @@ export class MetricDecoratorGenerator {
    * @param report This function will be called after method execution with StatsdArgs
    * @private
    */
-  private reportAfter(report: Function) {
-    return this.reportAround(undefined, report, undefined, '', '', '');
+  private afterDecorator(report: Function) {
+    return this.aroundDecorator(undefined, report, undefined, '', '', '');
   }
 
   /**
@@ -106,8 +138,8 @@ export class MetricDecoratorGenerator {
    * @param report This function will be called when method execution throws error with StatsdArgs
    * @private
    */
-  private reportOnError(report: Function) {
-    return this.reportAround(undefined, undefined, report, '', '', '');
+  private onErrorDecorator(report: Function) {
+    return this.aroundDecorator(undefined, undefined, report, '', '', '');
   }
 
   /**
@@ -121,7 +153,7 @@ export class MetricDecoratorGenerator {
    * @param errorSuffix suffix to add to onError metric name (default: `.failure`)
    * @private
    */
-  private reportAround(
+  private aroundDecorator(
     before: Function | undefined,
     after: Function | undefined,
     onError: Function | undefined,
