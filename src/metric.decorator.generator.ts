@@ -181,7 +181,7 @@ export class MetricDecoratorGenerator {
             /**
              *  👇Original method on which this decorator applies is called here👇
              */
-            const returnValue = original.apply(this, args);
+            const returnValue = original.apply(target, args);
 
             // Process after decorator
             this.runAdvice(after, value, [...args, returnValue], tagsDerivation, success);

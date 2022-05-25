@@ -1,6 +1,6 @@
 import { anything, objectContaining, resetCalls, verify } from 'ts-mockito';
 import { mockedStatsD } from './metric.decorator';
-import {CounterExampleWrapper, CounterTests} from './counter.example';
+import { CounterTests } from './counter.example';
 
 describe('Increment', () => {
   // const mockedStatsD: StatsD = mock(StatsD);
@@ -17,11 +17,11 @@ describe('Increment', () => {
       verify(mockedStatsD.increment('CounterTests.incBeforeAllDefaults', 1, objectContaining({}))).once();
     });
 
-    it('should increment by 1 when called from a different context', async () => {
-      const test = new CounterExampleWrapper(new CounterTests());
-      const result = await test.incBeforeWithFunctionDerivation();
-      expect(result).toEqual('incBeforeWithFunctionDerivation.returnValue');
-      verify(mockedStatsD.increment('before.derive', 15, objectContaining({}))).once();
+    it('decorated method should execute in correct context', async () => {
+      const test = new CounterTests();
+      const result = await test.incBeforeWithContext();
+      expect(result).toEqual('incBeforeWithContext.returnValue');
+      verify(mockedStatsD.increment('before.with.context', 98, objectContaining({}))).once();
     });
 
     it('should increment 1 be default', () => {

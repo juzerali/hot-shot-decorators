@@ -44,6 +44,14 @@ export class CounterTests {
         return 'incBeforeWithFunctionDerivation.returnValue';
     }
 
+    @IncrementBefore('before.with.context', 98)
+    public incBeforeWithContext() {
+        this.ghost();
+        return "incBeforeWithContext.returnValue"
+    }
+
+    private ghost() {}
+
     @IncrementBefore('before.derive.throws', (arg1: { amount: number }, arg2: object) => {
         throw new Error();
     })
@@ -224,11 +232,3 @@ export class CounterTests {
     }
 }
 
-export class CounterExampleWrapper {
-    constructor(public readonly counterTest: CounterTests) {
-    }
-
-    async incBeforeWithFunctionDerivation(): Promise<string> {
-        return Promise.resolve(this.counterTest.incBeforeWithFunctionDerivation({amount: 15}, {}));
-    }
-}

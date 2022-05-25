@@ -1,6 +1,6 @@
 {
   "name": "@clipboard-health/hot-shot-decorators",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Typescript decorators for metric reportage",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
