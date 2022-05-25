@@ -24,6 +24,13 @@ describe('Increment', () => {
       verify(mockedStatsD.increment('before.with.context', 98, objectContaining({}))).once();
     });
 
+    it('decorated method should execute with correct private variable', async () => {
+      const test = new CounterTests();
+      const result = await test.incBeforeWithPrivateVariable();
+      expect(result).toEqual('aPrivateVariable');
+      verify(mockedStatsD.increment('before.with.private.variable', 67, objectContaining({}))).once();
+    });
+
     it('should increment 1 be default', () => {
       const test = new CounterTests();
       const result = test.incBeforeDefaultValue();

@@ -4,6 +4,7 @@ import {IncrementAfter, IncrementAround, IncrementBefore, IncrementOnError} from
  * Class to help test count decorators
  */
 export class CounterTests {
+    private aPrivateVariable = "aPrivateVariable";
     /** Before **/
     @IncrementBefore()
     public incBeforeAllDefaults() {
@@ -51,6 +52,11 @@ export class CounterTests {
     }
 
     private ghost() {}
+
+    @IncrementBefore('before.with.private.variable', 67)
+    public incBeforeWithPrivateVariable() {
+        return this.aPrivateVariable;
+    }
 
     @IncrementBefore('before.derive.throws', (arg1: { amount: number }, arg2: object) => {
         throw new Error();

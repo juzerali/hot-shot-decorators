@@ -161,6 +161,7 @@ export class MetricDecoratorGenerator {
     afterSuffix = '.success',
     errorSuffix = '.failure',
   ) {
+    const self = this;
     return (name = '', value?: ValueDerivation, tagsDerivation: TagDerivation = {}): MethodDecorator => {
       return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor => {
         const original = descriptor.value;
@@ -173,24 +174,24 @@ export class MetricDecoratorGenerator {
         const failure = metric + errorSuffix;
 
         // Wrap original method call in around decorator be reassigning descriptor value
-        descriptor.value = (...args: any) => {
+        descriptor.value = function(...args: any) {
           try {
             // Process before decorator
-            this.runAdvice(before, value, args, tagsDerivation, attempted);
+            self.runAdvice(before, value, args, tagsDerivation, attempted);
 
             /**
              *  👇Original method on which this decorator applies is called here👇
              */
-            const returnValue = original.apply(target, args);
+            const returnValue = original.apply(this, args);
 
             // Process after decorator
-            this.runAdvice(after, value, [...args, returnValue], tagsDerivation, success);
+            self.runAdvice(after, value, [...args, returnValue], tagsDerivation, success);
 
             // Return value returned by original method (⚠️ Don't forget this, it could break target application behaviour)
             return returnValue;
           } catch (error) {
             // Process onError decorator
-            this.runAdvice(onError, value, [...args, error], tagsDerivation, failure);
+            self.runAdvice(onError, value, [...args, error], tagsDerivation, failure);
 
             // Rethrow error thrown by original method (⚠️ Don't forget this, it could break target application behaviour))
             throw error;
