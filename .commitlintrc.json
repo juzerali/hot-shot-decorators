@@ -1,0 +1,18 @@
+{
+  "extends": [
+    "@commitlint/config-conventional"
+  ],
+  "rules": {
+    "subject-case": [
+      2,
+      "never",
+      [
+        "start-case",
+        "pascal-case",
+        "camel-case",
+        "upper-case",
+        "kebab-case"
+      ]
+    ]
+  }
+}

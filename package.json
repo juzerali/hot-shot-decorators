@@ -5,11 +5,15 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "prepare": "husky install",
+    "lint": "eslint --max-warnings 0 src",
     "prepublish": "tsc --project tsconfig.json",
-    "test": "jest --config jestconfig.json",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
-    "lint": "tslint -p tsconfig.json",
-    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
+    "test": "jest --config jest.config.json",
+    "test:watch": "jest --config ./jest.config.json --watch",
+    "test:cov": "jest --config ./jest.config.json --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --config ./jest.config.json --runInBand",
+    "build": "npm run prepublish && npm run lint && npm run test",
+    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write --fix"
   },
   "repository": {
     "type": "git",
@@ -27,23 +31,39 @@
   },
   "homepage": "https://github.com/ClipboardHealth/hot-shot-decorators#readme",
   "devDependencies": {
-    "@babel/plugin-proposal-decorators": "^7.3.0",
-    "@babel/preset-env": "^7.17.10",
-    "@babel/preset-flow": "^7.0.0",
-    "@babel/preset-typescript": "^7.16.7",
+    "@commitlint/cli": "^14.1.0",
+    "@commitlint/config-conventional": "^14.1.0",
+    "@golevelup/ts-jest": "^0.3.3",
     "@types/jest": "^27.5.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "cspell": "^6.1.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "husky": "^7.0.4",
     "jest": "^28.1.0",
+    "lint-staged": "^13.0.0",
     "prettier": "^2.6.2",
     "ts-jest": "^28.0.2",
     "ts-mockito": "^2.6.1",
-    "tslint": "^6.1.3",
-    "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.6.4"
   },
   "dependencies": {
+    "eslint": "^8.16.0",
     "hot-shots": "^9.0.0",
     "path-value": "^0.9.4"
+  },
+  "lint-staged": {
+    "**/*.ts": [
+      "npx eslint --fix --max-warnings 0",
+      "npx jest --config ./jest.config.json --bail --findRelatedTests"
+    ],
+    "src/**/*.*": [
+      "npx cspell"
+    ],
+    "*.md": [
+      "npx cspell"
+    ]
   }
 }

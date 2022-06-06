@@ -1,6 +1,7 @@
-import { StatsD } from 'hot-shots';
-import { spy } from 'ts-mockito';
-import { MetricDecoratorGenerator } from './metric.decorator.generator';
+import { StatsD } from "hot-shots";
+import { spy } from "ts-mockito";
+
+import { MetricDecoratorGenerator } from "./metric.decorator.generator";
 
 /**
  * Copy this file in your project and make necessary changes
@@ -10,11 +11,11 @@ import { MetricDecoratorGenerator } from './metric.decorator.generator';
  * Setup hotshot config as per your environment
  */
 const hotShotConfig = {
-  host: process.env.DOGSTATSD_SERVER || 'localhost',
+  host: process.env.DOGSTATSD_SERVER || "localhost",
   port: process.env.DOGSTATSD_PORT ? +process.env.DOGSTATSD_PORT : 8125,
   globalTags: {
-    env: process.env.NODE_ENV || 'development',
-    service: 'my-service',
+    env: process.env.NODE_ENV || "development",
+    service: "my-service",
   },
 };
 

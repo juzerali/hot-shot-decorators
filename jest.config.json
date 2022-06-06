@@ -1,0 +1,27 @@
+{
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testMatch": [
+    "<rootDir>/src/**/*.spec.ts"
+  ],
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^src/(.*)$": "<rootDir>/src/$1"
+  },
+  "collectCoverageFrom": [
+    "src/**/*.ts",
+    "!src/**/index.ts",
+    "!src/testing-support/**",
+    "!src/main.ts",
+    "!src/**/*.module.ts",
+    "!src/authentication/firebase.authentication.service.ts",
+    "!src/authentication/firebase.config.ts"
+  ]
+}

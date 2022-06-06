@@ -1,47 +1,90 @@
-import { resolvePath } from 'path-value';
-import { Tags } from 'hot-shots';
+import { Tags } from "hot-shots";
+import { resolvePath } from "path-value";
 
 export type TagDerivation = Tags | TagDerivationFunc | undefined;
 export type ValueDerivation = number | string | ValueDerivationFunc | undefined;
-type ValueDerivationFunc = (...args: any[]) => number;
-type TagDerivationFunc = (...args: any[]) => Tags;
+type ValueDerivationFunc = (...args: unknown[]) => number;
+type TagDerivationFunc = (...args: unknown[]) => Tags;
 
 /**
- * Helper function that determines metric name. If empty or undefined metric name is passed, Classname#methodName will
+ * Helper function that determines metric name. If empty or undefined metric name is passed, ClassName#methodName will
  * be used as default metric name
  *
  * @param name
  * @param target
  * @param descriptor
  */
-export function getMetricName(name: string, target: any, descriptor: PropertyDescriptor) {
-  return name && name.length !== 0 ? name : target.constructor.name + '.' + descriptor.value.name;
+export function getMetricName(
+  name: string,
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  target: Object,
+  descriptor: PropertyDescriptor
+) {
+  return name && name.length !== 0
+    ? name
+    : target.constructor.name + "." + descriptor.value.name;
 }
 
-function numericValueResolver(actualValue: number, value: number | string | ValueDerivation) {
-  actualValue = value as number;
+function numericValueResolver(
+  actualValue: number,
+  value: ValueDerivation
+): number {
+  if (value === undefined) return actualValue;
+  if (typeof value === "number") {
+    return value;
+  } else if (typeof value === "string") {
+    if (!Number.isNaN(value)) {
+      return Number(value);
+    } else {
+      return actualValue;
+    }
+  } else if (typeof value === "function") {
+    return value(actualValue);
+  }
   return actualValue;
 }
 
-function functionValueResolver(value: ValueDerivationFunc, args: any, actualValue: number) {
+function functionValueResolver(
+  value: ValueDerivationFunc,
+  args: unknown[],
+  actualValue: number
+) {
   {
-    const result = value.apply(null, args);
+    const result = value(...args);
     if (Number.isFinite(result)) {
       actualValue = result;
     } else {
-      console.error('Given function ' + value + ' derived value ' + result + ' is not a number. Defaulting to 1.');
+      console.error(
+        "Given function " +
+          value +
+          " derived value " +
+          result +
+          " is not a number. Defaulting to 1."
+      );
     }
   }
   return actualValue;
 }
 
-function pathValueResolver(args: any, value: string, actualValue: number) {
+function pathValueResolver(
+  args: unknown[],
+  value: string,
+  actualValue: number
+) {
   {
     const resolved = resolvePath(args, value);
     if (!resolved.exists) {
-      console.error('Given path for increment value ' + value + ' does not exist. Defaulting to 1');
+      console.error(
+        "Given path for increment value " +
+          value +
+          " does not exist. Defaulting to 1"
+      );
     } else if (!Number.isFinite(resolved.value)) {
-      console.error('Given path for increment value ' + value + ' is not a number. Defaulting to 1');
+      console.error(
+        "Given path for increment value " +
+          value +
+          " is not a number. Defaulting to 1"
+      );
     } else {
       actualValue = resolved.value;
     }
@@ -59,23 +102,29 @@ function pathValueResolver(args: any, value: string, actualValue: number) {
  * @param value 25 | "0.deeply.nested.path"
  * @param args
  */
-export function resolveValue(value: ValueDerivation, args: any) {
+export function resolveValue(value: ValueDerivation, args: unknown[]) {
   let actualValue = 1;
 
   try {
     if (value === undefined) actualValue = 1;
-    else if (Number.isFinite(value)) actualValue = numericValueResolver(actualValue, value);
-    else if (typeof value === 'function') actualValue = functionValueResolver(value, args, actualValue);
-    else if (typeof value === 'string') actualValue = pathValueResolver(args, value, actualValue);
+    else if (Number.isFinite(value))
+      actualValue = numericValueResolver(actualValue, value);
+    else if (typeof value === "function")
+      actualValue = functionValueResolver(value, args, actualValue);
+    else if (typeof value === "string")
+      actualValue = pathValueResolver(args, value, actualValue);
   } catch (e) {
-    console.error('Failed to derive metric value! ' + value, e);
+    console.error("Failed to derive metric value! " + value, e);
   }
 
   return actualValue;
 }
 
-function functionTagResolver(tags: TagDerivationFunc, args: any): Tags {
-  return tags.apply(null, args);
+function functionTagResolver(
+  tags: TagDerivationFunc,
+  ...args: unknown[]
+): Tags {
+  return tags(...args);
 }
 
 /**
@@ -84,13 +133,14 @@ function functionTagResolver(tags: TagDerivationFunc, args: any): Tags {
  * @param args
  */
 
-export function resolveTags(tags: TagDerivation, args: any): Tags {
+export function resolveTags(tags: TagDerivation, args: unknown[]): Tags {
   try {
     if (tags === undefined) return {};
-    else if (typeof tags === 'function') return functionTagResolver(tags, args);
-    return tags as Tags;
+    else if (typeof tags === "function")
+      return functionTagResolver(tags, ...args);
+    return tags;
   } catch (e) {
-    console.error('Failed to derive tags! ' + tags, e);
+    console.error("Failed to derive tags! " + tags, e);
     return {};
   }
 }

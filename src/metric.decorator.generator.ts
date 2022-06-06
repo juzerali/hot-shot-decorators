@@ -1,12 +1,13 @@
-import {StatsCb, StatsD, Tags} from 'hot-shots';
-import {getMetricName, resolveTags, resolveValue, TagDerivation, ValueDerivation} from './util';
+/* eslint-disable @typescript-eslint/ban-types */
+import { StatsD } from "hot-shots";
 
-type StatsdArgs = [
-  stat: string | string[],
-  value: number,
-  sampleRate?: number | undefined,
-  callback?: StatsCb | undefined,
-];
+import {
+  getMetricName,
+  resolveTags,
+  resolveValue,
+  TagDerivation,
+  ValueDerivation,
+} from "./util";
 
 /**
  * This class takes StatsD client as input and generates metric decorators
@@ -14,12 +15,12 @@ type StatsdArgs = [
 export class MetricDecoratorGenerator {
   constructor(
     private statsd = new StatsD({
-      host: 'localhost',
+      host: "localhost",
       port: 8125,
       globalTags: {
-        env: 'development',
+        env: "development",
       },
-    }),
+    })
   ) {}
 
   /**
@@ -50,7 +51,11 @@ export class MetricDecoratorGenerator {
    * Generates a decorator that executes advice before method execution
    * @param advice - advice to run
    */
-  public around(beforeAdvice: Function, afterAdvice: Function, onErrorAdvice: Function) {
+  public around(
+    beforeAdvice: Function,
+    afterAdvice: Function,
+    onErrorAdvice: Function
+  ) {
     return this.aroundDecorator(beforeAdvice, afterAdvice, onErrorAdvice);
   }
 
@@ -80,7 +85,11 @@ export class MetricDecoratorGenerator {
    * `attempted`, `successful`, and `failed` suffixes respectively.
    */
   public incAround() {
-    return this.around(this.statsd.increment, this.statsd.increment, this.statsd.increment);
+    return this.around(
+      this.statsd.increment,
+      this.statsd.increment,
+      this.statsd.increment
+    );
   }
 
   /**
@@ -109,7 +118,11 @@ export class MetricDecoratorGenerator {
    * with `attempted`, `successful`, and `failed` suffixes respectively.
    */
   public histogramAround() {
-    return this.around(this.statsd.histogram, this.statsd.histogram, this.statsd.histogram);
+    return this.around(
+      this.statsd.histogram,
+      this.statsd.histogram,
+      this.statsd.histogram
+    );
   }
 
   /**
@@ -119,7 +132,7 @@ export class MetricDecoratorGenerator {
    * @private
    */
   private beforeDecorator(report: Function) {
-    return this.aroundDecorator(report, undefined, undefined, '', '', '');
+    return this.aroundDecorator(report, undefined, undefined, "", "", "");
   }
 
   /**
@@ -129,7 +142,7 @@ export class MetricDecoratorGenerator {
    * @private
    */
   private afterDecorator(report: Function) {
-    return this.aroundDecorator(undefined, report, undefined, '', '', '');
+    return this.aroundDecorator(undefined, report, undefined, "", "", "");
   }
 
   /**
@@ -139,7 +152,7 @@ export class MetricDecoratorGenerator {
    * @private
    */
   private onErrorDecorator(report: Function) {
-    return this.aroundDecorator(undefined, undefined, report, '', '', '');
+    return this.aroundDecorator(undefined, undefined, report, "", "", "");
   }
 
   /**
@@ -157,13 +170,21 @@ export class MetricDecoratorGenerator {
     before: Function | undefined,
     after: Function | undefined,
     onError: Function | undefined,
-    beforeSuffix = '.attempted',
-    afterSuffix = '.success',
-    errorSuffix = '.failure',
+    beforeSuffix = ".attempted",
+    afterSuffix = ".success",
+    errorSuffix = ".failure"
   ) {
-    const self = this;
-    return (name = '', value?: ValueDerivation, tagsDerivation: TagDerivation = {}): MethodDecorator => {
-      return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor => {
+    const generatorClass = { t: this };
+    return (
+      name = "",
+      value?: ValueDerivation,
+      tagsDerivation: TagDerivation = {}
+    ): MethodDecorator => {
+      return (
+        target: Object,
+        _propertyKey: string | symbol,
+        descriptor: PropertyDescriptor
+      ): PropertyDescriptor => {
         const original = descriptor.value;
 
         // Resolve metric name
@@ -174,10 +195,16 @@ export class MetricDecoratorGenerator {
         const failure = metric + errorSuffix;
 
         // Wrap original method call in around decorator be reassigning descriptor value
-        descriptor.value = function(...args: any) {
+        descriptor.value = function (...args: unknown[]) {
           try {
             // Process before decorator
-            self.runAdvice(before, value, args, tagsDerivation, attempted);
+            generatorClass.t.runAdvice(
+              before,
+              value,
+              args,
+              tagsDerivation,
+              attempted
+            );
 
             /**
              *  👇Original method on which this decorator applies is called here👇
@@ -185,15 +212,27 @@ export class MetricDecoratorGenerator {
             const returnValue = original.apply(this, args);
 
             // Process after decorator
-            self.runAdvice(after, value, [...args, returnValue], tagsDerivation, success);
+            generatorClass.t.runAdvice(
+              after,
+              value,
+              [...args, returnValue],
+              tagsDerivation,
+              success
+            );
 
-            // Return value returned by original method (⚠️ Don't forget this, it could break target application behaviour)
+            // Return value returned by original method (⚠️ Don't forget this, it could break target application behavior)
             return returnValue;
           } catch (error) {
             // Process onError decorator
-            self.runAdvice(onError, value, [...args, error], tagsDerivation, failure);
+            generatorClass.t.runAdvice(
+              onError,
+              value,
+              [...args, error],
+              tagsDerivation,
+              failure
+            );
 
-            // Rethrow error thrown by original method (⚠️ Don't forget this, it could break target application behaviour))
+            // Rethrow error thrown by original method (⚠️ Don't forget this, it could break target application behavior))
             throw error;
           }
         };
@@ -204,10 +243,10 @@ export class MetricDecoratorGenerator {
 
   private runAdvice(
     func: Function | undefined,
-    value: number | string | ((...args: any[]) => number) | undefined,
-    args: any,
-    tagsDerivation: { [p: string]: string } | string[] | ((...args: any[]) => Tags) | undefined,
-    metric: string,
+    value: number | string | ((...args: unknown[]) => number) | undefined,
+    args: unknown[],
+    tagsDerivation: TagDerivation,
+    metric: string
   ) {
     if (func) {
       try {

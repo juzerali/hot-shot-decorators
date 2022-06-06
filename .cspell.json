@@ -1,0 +1,22 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "allowCompoundWords": true,
+  "words": [
+    "ddsource",
+    "nestjs",
+    "postgres",
+    "postgresql",
+    "ddtags",
+    "golevelup",
+    "roboto",
+    "dtos",
+    "authz",
+    "gobblygook",
+    "mockito",
+    "DOGSTATSD"
+  ],
+  "ignorePaths": [
+    "node_modules/**"
+  ]
+}
